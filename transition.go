@@ -4,7 +4,7 @@ import (
 	"strconv"
 )
 
-func (v *Vmix) sendTransition(transition string, input interface{}) error {
+func (v *Vmix) sendTransition(transition string, input interface{}, duration uint) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err
@@ -14,6 +14,7 @@ func (v *Vmix) sendTransition(transition string, input interface{}) error {
 	}
 	params := make(map[string]string)
 	params["Input"] = in
+	params["Duration"] = strconv.Itoa(int(duration))
 	if err := v.SendFunction(transition, params); err != nil {
 		return err
 	}
@@ -21,93 +22,93 @@ func (v *Vmix) sendTransition(transition string, input interface{}) error {
 }
 
 // Fade transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) Fade(scene interface{}) error {
-	return v.sendTransition("Fade", scene)
+func (v *Vmix) Fade(scene interface{}, duration uint) error {
+	return v.sendTransition("Fade", scene, duration)
 }
 
 // Zoom transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) Zoom(scene interface{}) error {
-	return v.sendTransition("Zoom", scene)
+func (v *Vmix) Zoom(scene interface{}, duration uint) error {
+	return v.sendTransition("Zoom", scene, duration)
 }
 
 // Wipe transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) Wipe(scene interface{}) error {
-	return v.sendTransition("Wipe", scene)
+func (v *Vmix) Wipe(scene interface{}, duration uint) error {
+	return v.sendTransition("Wipe", scene, duration)
 }
 
 // Slide transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) Slide(scene interface{}) error {
-	return v.sendTransition("Slide", scene)
+func (v *Vmix) Slide(scene interface{}, duration uint) error {
+	return v.sendTransition("Slide", scene, duration)
 }
 
 // Fly transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) Fly(scene interface{}) error {
-	return v.sendTransition("Fly", scene)
+func (v *Vmix) Fly(scene interface{}, duration uint) error {
+	return v.sendTransition("Fly", scene, duration)
 }
 
 // CrossZoom transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) CrossZoom(scene interface{}) error {
-	return v.sendTransition("CrossZoom", scene)
+func (v *Vmix) CrossZoom(scene interface{}, duration uint) error {
+	return v.sendTransition("CrossZoom", scene, duration)
 }
 
 // FlyRotate transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) FlyRotate(scene interface{}) error {
-	return v.sendTransition("FlyRotate", scene)
+func (v *Vmix) FlyRotate(scene interface{}, duration uint) error {
+	return v.sendTransition("FlyRotate", scene, duration)
 }
 
 // Cube transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) Cube(scene interface{}) error {
-	return v.sendTransition("Cube", scene)
+func (v *Vmix) Cube(scene interface{}, duration uint) error {
+	return v.sendTransition("Cube", scene, duration)
 }
 
 // CubeZoom transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) CubeZoom(scene interface{}) error {
-	return v.sendTransition("CubeZoom", scene)
+func (v *Vmix) CubeZoom(scene interface{}, duration uint) error {
+	return v.sendTransition("CubeZoom", scene, duration)
 }
 
 // VerticalWipe transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) VerticalWipe(scene interface{}) error {
-	return v.sendTransition("VerticalWipe", scene)
+func (v *Vmix) VerticalWipe(scene interface{}, duration uint) error {
+	return v.sendTransition("VerticalWipe", scene, duration)
 }
 
 // VerticalSlide transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) VerticalSlide(scene interface{}) error {
-	return v.sendTransition("VerticalSlide", scene)
+func (v *Vmix) VerticalSlide(scene interface{}, duration uint) error {
+	return v.sendTransition("VerticalSlide", scene, duration)
 }
 
 // Merge transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) Merge(scene interface{}) error {
-	return v.sendTransition("Merge", scene)
+func (v *Vmix) Merge(scene interface{}, duration uint) error {
+	return v.sendTransition("Merge", scene, duration)
 }
 
 // WipeReverse transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) WipeReverse(scene interface{}) error {
-	return v.sendTransition("WipeReverse", scene)
+func (v *Vmix) WipeReverse(scene interface{}, duration uint) error {
+	return v.sendTransition("WipeReverse", scene, duration)
 }
 
 // SlideReverse transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) SlideReverse(scene interface{}) error {
-	return v.sendTransition("SlideReverse", scene)
+func (v *Vmix) SlideReverse(scene interface{}, duration uint) error {
+	return v.sendTransition("SlideReverse", scene, duration)
 }
 
 // VerticalWipeReverse transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) VerticalWipeReverse(scene interface{}) error {
-	return v.sendTransition("VerticalWipeReverse", scene)
+func (v *Vmix) VerticalWipeReverse(scene interface{}, duration uint) error {
+	return v.sendTransition("VerticalWipeReverse", scene, duration)
 }
 
 // VerticalSlideReverse transition. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) VerticalSlideReverse(scene interface{}) error {
-	return v.sendTransition("VerticalSlideReverse", scene)
+func (v *Vmix) VerticalSlideReverse(scene interface{}, duration uint) error {
+	return v.sendTransition("VerticalSlideReverse", scene, duration)
 }
 
 // Cut You can use string scene-key, int scene-number or vmixgo.Scene struct.
 func (v *Vmix) Cut(scene interface{}) error {
-	return v.sendTransition("Cut", scene)
+	return v.sendTransition("Cut", scene, 0)
 }
 
 // CutDirect Cuts the input directly to Output without changing Preview. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) CutDirect(scene interface{}) error {
-	return v.sendTransition("CutDirect", scene)
+func (v *Vmix) CutDirect(scene interface{}, duration uint) error {
+	return v.sendTransition("CutDirect", scene, duration)
 }
 
 // FadeToBlack Toggle FTB On/Off
@@ -117,7 +118,7 @@ func (v *Vmix) FadeToBlack() error {
 
 // QuickPlay You can use string scene-key, int scene-number or vmixgo.Scene struct.
 func (v *Vmix) QuickPlay(scene interface{}) error {
-	return v.sendTransition("QuickPlay", scene)
+	return v.sendTransition("QuickPlay", scene, 0)
 }
 
 // SetFader Set Master Fader T-Bar,255 will cut to Preview
@@ -185,12 +186,12 @@ func (v *Vmix) SetTransitionEffect4(transition string) error {
 
 // Stinger1 You can use string scene-key, int scene-number or vmixgo.Scene struct.
 func (v *Vmix) Stinger1(scene interface{}) error {
-	return v.sendTransition("Stinger1", scene)
+	return v.sendTransition("Stinger1", scene, 0)
 }
 
 // Stinger2 You can use string scene-key, int scene-number or vmixgo.Scene struct.
 func (v *Vmix) Stinger2(scene interface{}) error {
-	return v.sendTransition("Stinger2", scene)
+	return v.sendTransition("Stinger2", scene, 0)
 }
 
 // Transition1 Clicks one of the four Transition buttons in the main vmix window

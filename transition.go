@@ -1,41 +1,21 @@
 package vmixgo
 
 import (
-	"fmt"
-	"reflect"
 	"strconv"
 )
 
 func (v *Vmix) sendTransition(transition string, input interface{}) error {
-	s := reflect.ValueOf(input)
-	if !s.IsValid() {
-		if err := v.SendFunction(transition, nil); err != nil {
-			return err
-		}
+	in, err := resolveInput(input)
+	if err != nil {
+		return err
 	}
-	// fmt.Printf("type : %v", s.Type().String())
-	switch s.Type().String() {
-	case "int":
-		params := make(map[string]string)
-		params["Input"] = strconv.Itoa(input.(int))
-		if err := v.SendFunction(transition, params); err != nil {
-			return err
-		}
-	case "string":
-		params := make(map[string]string)
-		params["Input"] = input.(string)
-		if err := v.SendFunction(transition, params); err != nil {
-			return err
-		}
-	case "vmixgo.Input":
-		params := make(map[string]string)
-		in := input.(Input)
-		params["Input"] = in.Key
-		if err := v.SendFunction(transition, params); err != nil {
-			return err
-		}
-	default:
-		return fmt.Errorf("Interface type not correct")
+	if err := v.SendFunction(transition, nil); err != nil {
+		return err
+	}
+	params := make(map[string]string)
+	params["Input"] = in
+	if err := v.SendFunction(transition, params); err != nil {
+		return err
 	}
 	return nil
 }

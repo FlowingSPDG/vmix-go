@@ -14,13 +14,13 @@ func main() {
 	log.Printf("vmix version: %v\n", vmix.Version)
 	log.Printf("vmix edition: %v\n", vmix.Edition)
 	for i := 0; i < len(vmix.Inputs.Input); i++ {
-		log.Printf("Input %d : %v", i, vmix.Inputs.Input[i])
+		log.Printf("Input %d : %v", vmix.Inputs.Input[i].Number, vmix.Inputs.Input[i])
 	}
 	for i := 0; i < len(vmix.Overlays.Overlay); i++ {
-		log.Printf("Overlay %d : %v", i, vmix.Overlays.Overlay[i])
+		log.Printf("Overlay %d : %v", vmix.Overlays.Overlay[i].Number, vmix.Overlays.Overlay[i])
 	}
 	for i := 0; i < len(vmix.Transitions.Transition); i++ {
-		log.Printf("Transition %d : %v", i, vmix.Transitions.Transition[i])
+		log.Printf("Transition %d : %v", vmix.Transitions.Transition[i].Number, vmix.Transitions.Transition[i])
 	}
 
 	err = vmix.Fade(vmix.Inputs.Input[0], 500)

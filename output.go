@@ -21,32 +21,32 @@ func (v *Vmix) FullscreenOn() error {
 
 // SetOutput2 Change what is displayed on Output 2 output. Preview,MultiView,Input?
 func (v *Vmix) SetOutput2(input interface{}) error {
-	return v.sendTransition("SetOutput2", input)
+	return v.sendTransition("SetOutput2", input, 0)
 }
 
 // SetOutput3 Change what is displayed on Output 3 output. Preview,MultiView,Input?
 func (v *Vmix) SetOutput3(input interface{}) error {
-	return v.sendTransition("SetOutput3", input)
+	return v.sendTransition("SetOutput3", input, 0)
 }
 
 // SetOutput4 Change what is displayed on Output 4 output. Preview,MultiView,Input?
 func (v *Vmix) SetOutput4(input interface{}) error {
-	return v.sendTransition("SetOutput4", input)
+	return v.sendTransition("SetOutput4", input, 0)
 }
 
 // SetOutputExternal2 Change what is displayed on the External2 output. Preview,MultiView,Input?
 func (v *Vmix) SetOutputExternal2(input interface{}) error {
-	return v.sendTransition("SetOutputExternal2", input)
+	return v.sendTransition("SetOutputExternal2", input, 0)
 }
 
 // SetOutputFullscreen Change what is displayed on the Fullscreen output. Preview,MultiView,Input?
 func (v *Vmix) SetOutputFullscreen(input interface{}) error {
-	return v.sendTransition("SetOutputFullscreen", input)
+	return v.sendTransition("SetOutputFullscreen", input, 0)
 }
 
 // SetOutputFullscreen2 Change what is displayed on the Fullscreen2 output. Preview,MultiView,Input?
 func (v *Vmix) SetOutputFullscreen2(input interface{}) error {
-	return v.sendTransition("SetOutputFullscreen2", input)
+	return v.sendTransition("SetOutputFullscreen2", input, 0)
 }
 
 // Snapshot Create a snapshot iamge of the current Output. Optional Value specifies save Filename, otherwise a save file window will appear.
@@ -65,7 +65,7 @@ func (v *Vmix) SnapshotInput(savedir string, input interface{}) error {
 		return err
 	}
 	params["Input"] = in
-	return v.sendTransition("SnapShotInput", params)
+	return v.SendFunction("SnapShotInput", params)
 }
 
 // StartExternal ?

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/FlowingSPDG/vmix-go"
 	"github.com/c-bata/go-prompt"
@@ -8,6 +9,7 @@ import (
 
 var (
 	Inputs []vmixgo.Input
+	addr   *string
 )
 
 func TransitionCompleter(d prompt.Document) []prompt.Suggest {
@@ -29,8 +31,12 @@ func InputCompleter(d prompt.Document) []prompt.Suggest {
 	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
 }
 
+func init() {
+	addr = flag.String("addr", "http://localhost:8088", "vMix API Address")
+}
+
 func main() {
-	vmix, err := vmixgo.NewVmix("http://192.168.1.19:8088")
+	vmix, err := vmixgo.NewVmix(*addr)
 	if err != nil {
 		panic(err)
 	}

@@ -2,32 +2,9 @@ package vmixgo
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"reflect"
 	"strconv"
 )
-
-// SendFunction sends request to /api?Function=funcname&Key=Value...
-func (v *Vmix) SendFunction(funcname string, params map[string]string) error {
-	q := v.Addr.Query()
-	q.Add("Function", funcname)
-	for k, v := range params {
-		q.Add(k, v)
-	}
-	req := *v.Addr
-	url := q.Encode()
-	req.RawQuery = url
-	resp, err := http.Get(req.String())
-	if err != nil {
-		return fmt.Errorf("Failed to send function... %v", err)
-	}
-	_, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("Failed to Read body... %v", err)
-	}
-	return nil
-}
 
 func (v *Vmix) sendTransition(transition string, scene interface{}) error {
 	s := reflect.ValueOf(scene)

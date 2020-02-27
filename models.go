@@ -4,11 +4,8 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"net/url"
-	"reflect"
-	"strconv"
-	// "log"
 	"net/http"
+	"net/url"
 )
 
 // Vmix main object
@@ -28,9 +25,9 @@ type Vmix struct {
 	Overlays struct {
 		Overlay []Overlay `xml:"overlay"`
 	} `xml:"overlays"`
-	Preview     uint `xml:"preview"`     // Preview scene number
-	Active      uint `xml:"active"`      // Active scene number
-	FadeToBlack bool `xml:"fadeToBlack"` // FTB activated or not
+	Preview       uint `xml:"preview"`     // Preview scene number
+	Active        uint `xml:"active"`      // Active scene number
+	IsFadeToBlack bool `xml:"fadeToBlack"` // FTB activated or not
 	// vmix transition
 	Transitions struct {
 		Transition []Transition `xml:"transition"`
@@ -64,99 +61,6 @@ func (v *Vmix) Refresh() error {
 		return fmt.Errorf("Failed to unmarshal XML... %v", err)
 	}
 	v = &vnew
-	return nil
-}
-func (v *Vmix) sendFunction(funcname string, params map[string]string) error {
-	q := v.Addr.Query()
-	q.Add("Function", funcname)
-	for k, v := range params {
-		q.Add(k, v)
-	}
-	req := *v.Addr
-	url := q.Encode()
-	req.RawQuery = url
-	resp, err := http.Get(req.String())
-	if err != nil {
-		return fmt.Errorf("Failed to send function... %v", err)
-	}
-	_, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("Failed to Read body... %v", err)
-	}
-	return nil
-}
-
-// Cut scene. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) Cut(scene interface{}) error {
-	s := reflect.ValueOf(scene)
-	if !s.IsValid() {
-		if err := v.sendFunction("Cut", nil); err != nil {
-			return err
-		}
-	}
-	// fmt.Printf("type : %v", s.Type().String())
-	switch s.Type().String() {
-	case "int":
-		params := make(map[string]string)
-		params["Input"] = strconv.Itoa(scene.(int))
-		if err := v.sendFunction("Cut", params); err != nil {
-			return err
-		}
-	case "string":
-		params := make(map[string]string)
-		params["Input"] = scene.(string)
-		if err := v.sendFunction("Cut", params); err != nil {
-			return err
-		}
-	case "vmixgo.Input":
-		params := make(map[string]string)
-		in := scene.(Input)
-		params["Input"] = in.Key
-		if err := v.sendFunction("Cut", params); err != nil {
-			return err
-		}
-	default:
-		return fmt.Errorf("Interface type not correct")
-	}
-	return nil
-}
-
-// Fade scene. You can use string scene-key, int scene-number or vmixgo.Scene struct.
-func (v *Vmix) Fade(scene interface{}, duration int) error {
-	s := reflect.ValueOf(scene)
-	if !s.IsValid() {
-		if err := v.sendFunction("Fade", nil); err != nil {
-			return err
-		}
-		return nil
-	}
-	// fmt.Printf("type : %v", s.Type().String())
-	switch s.Type().String() {
-	case "int":
-		params := make(map[string]string)
-		params["Input"] = strconv.Itoa(scene.(int))
-		params["Duration"] = strconv.Itoa(duration)
-		if err := v.sendFunction("Fade", params); err != nil {
-			return err
-		}
-	case "string":
-		params := make(map[string]string)
-		params["Input"] = scene.(string)
-		params["Duration"] = strconv.Itoa(duration)
-		if err := v.sendFunction("Fade", params); err != nil {
-			return err
-		}
-	case "vmixgo.Input":
-		params := make(map[string]string)
-		in := scene.(Input)
-		params["Input"] = in.Key
-		params["Duration"] = strconv.Itoa(duration)
-		if err := v.sendFunction("Fade", params); err != nil {
-			return err
-		}
-	default:
-		return fmt.Errorf("Interface type not correct")
-	}
 	return nil
 }
 

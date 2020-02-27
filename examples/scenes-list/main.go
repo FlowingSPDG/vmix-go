@@ -1,13 +1,23 @@
 package main
 
 import (
+	"flag"
 	"github.com/FlowingSPDG/vmix-go"
 	"log"
 	"time"
 )
 
+var (
+	addr *string
+)
+
+func init() {
+	addr = flag.String("addr", "http://localhost:8088", "vMix API Address")
+	flag.Parse()
+}
+
 func main() {
-	vmix, err := vmixgo.NewVmix("http://192.168.1.19:8088")
+	vmix, err := vmixgo.NewVmix(*addr)
 	if err != nil {
 		panic(err)
 	}

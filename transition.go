@@ -6,8 +6,8 @@ import (
 	"strconv"
 )
 
-func (v *Vmix) sendTransition(transition string, scene interface{}) error {
-	s := reflect.ValueOf(scene)
+func (v *Vmix) sendTransition(transition string, input interface{}) error {
+	s := reflect.ValueOf(input)
 	if !s.IsValid() {
 		if err := v.SendFunction(transition, nil); err != nil {
 			return err
@@ -17,19 +17,19 @@ func (v *Vmix) sendTransition(transition string, scene interface{}) error {
 	switch s.Type().String() {
 	case "int":
 		params := make(map[string]string)
-		params["Input"] = strconv.Itoa(scene.(int))
+		params["Input"] = strconv.Itoa(input.(int))
 		if err := v.SendFunction(transition, params); err != nil {
 			return err
 		}
 	case "string":
 		params := make(map[string]string)
-		params["Input"] = scene.(string)
+		params["Input"] = input.(string)
 		if err := v.SendFunction(transition, params); err != nil {
 			return err
 		}
 	case "vmixgo.Input":
 		params := make(map[string]string)
-		in := scene.(Input)
+		in := input.(Input)
 		params["Input"] = in.Key
 		if err := v.SendFunction(transition, params); err != nil {
 			return err

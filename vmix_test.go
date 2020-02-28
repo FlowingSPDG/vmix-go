@@ -576,7 +576,7 @@ func TestStreamingSetURL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = vmix.StreamingSetURL("URL")
+	err = vmix.StreamingSetURL("rtmp://example.com")
 	if err != nil {
 		t.Fatal(err)
 	}

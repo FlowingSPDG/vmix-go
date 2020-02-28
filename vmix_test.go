@@ -296,3 +296,309 @@ func TestNDIStopRecording(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// output.go
+func TestFullscreen(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Fullscreen()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestFullscreenOff(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.FullscreenOff()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+func TestFullscreenOn(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.FullscreenOn()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetOutput2(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetOutput2(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetOutput3(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetOutput3(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetOutput4(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetOutput4(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetOutputExternal2(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetOutputExternal2(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetOutputFullscreen(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetOutputFullscreen(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetOutputFullscreen2(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetOutputFullscreen2(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSnapshot(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Snapshot("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSnapshotInput(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SnapshotInput(0, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStartExternal(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StartExternal()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStartMultiCorder(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StartMultiCorder()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStartRecording(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StartRecording()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStartStopExternal(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StartStopExternal()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStartStopMultiCorder(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StartStopMultiCorder()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStartStopRecording(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StartStopRecording()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStartStopStreaming(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StartStopStreaming(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStartStreaming(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StartStreaming(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStopExternal(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StopExternal()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStopMultiCorder(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StopMultiCorder()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStopRecording(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StopRecording()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStopStreaming(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StopStreaming(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStreamingSetKey(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StreamingSetKey("KEY")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStreamingSetPassword(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StreamingSetPassword("Pass")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+func TestStreamingSetURL(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StreamingSetURL("URL")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+func TestStreamingSetUsername(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StreamingSetUsername("Username")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestWriteDurationToRecordingLog(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.WriteDurationToRecordingLog("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}

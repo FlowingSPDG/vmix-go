@@ -20,33 +20,75 @@ func (v *Vmix) FullscreenOn() error {
 }
 
 // SetOutput2 Change what is displayed on Output 2 output. Preview,MultiView,Input?
-func (v *Vmix) SetOutput2(input interface{}) error {
-	return v.sendTransition("SetOutput2", input, 0)
+func (v *Vmix) SetOutput2(input interface{}, value string) error {
+	in, err := resolveInput(input)
+	if err != nil {
+		return err
+	}
+	params := make(map[string]string)
+	params["Input"] = in
+	params["Value"] = value
+	return v.SendFunction("SetOutput2", params)
 }
 
 // SetOutput3 Change what is displayed on Output 3 output. Preview,MultiView,Input?
-func (v *Vmix) SetOutput3(input interface{}) error {
-	return v.sendTransition("SetOutput3", input, 0)
+func (v *Vmix) SetOutput3(input interface{}, value string) error {
+	in, err := resolveInput(input)
+	if err != nil {
+		return err
+	}
+	params := make(map[string]string)
+	params["Input"] = in
+	params["Value"] = value
+	return v.SendFunction("SetOutput3", params)
 }
 
 // SetOutput4 Change what is displayed on Output 4 output. Preview,MultiView,Input?
-func (v *Vmix) SetOutput4(input interface{}) error {
-	return v.sendTransition("SetOutput4", input, 0)
+func (v *Vmix) SetOutput4(input interface{}, value string) error {
+	in, err := resolveInput(input)
+	if err != nil {
+		return err
+	}
+	params := make(map[string]string)
+	params["Input"] = in
+	params["Value"] = value
+	return v.SendFunction("SetOutput4", params)
 }
 
 // SetOutputExternal2 Change what is displayed on the External2 output. Preview,MultiView,Input?
-func (v *Vmix) SetOutputExternal2(input interface{}) error {
-	return v.sendTransition("SetOutputExternal2", input, 0)
+func (v *Vmix) SetOutputExternal2(input interface{}, value string) error {
+	in, err := resolveInput(input)
+	if err != nil {
+		return err
+	}
+	params := make(map[string]string)
+	params["Input"] = in
+	params["Value"] = value
+	return v.SendFunction("SetOutputExternal2", params)
 }
 
 // SetOutputFullscreen Change what is displayed on the Fullscreen output. Preview,MultiView,Input?
-func (v *Vmix) SetOutputFullscreen(input interface{}) error {
-	return v.sendTransition("SetOutputFullscreen", input, 0)
+func (v *Vmix) SetOutputFullscreen(input interface{}, value string) error {
+	in, err := resolveInput(input)
+	if err != nil {
+		return err
+	}
+	params := make(map[string]string)
+	params["Input"] = in
+	params["Value"] = value
+	return v.SendFunction("SetOutputFullscreen", params)
 }
 
 // SetOutputFullscreen2 Change what is displayed on the Fullscreen2 output. Preview,MultiView,Input?
-func (v *Vmix) SetOutputFullscreen2(input interface{}) error {
-	return v.sendTransition("SetOutputFullscreen2", input, 0)
+func (v *Vmix) SetOutputFullscreen2(input interface{}, value string) error {
+	in, err := resolveInput(input)
+	if err != nil {
+		return err
+	}
+	params := make(map[string]string)
+	params["Input"] = in
+	params["Value"] = value
+	return v.SendFunction("SetOutputFullscreen2", params)
 }
 
 // Snapshot Create a snapshot iamge of the current Output. Optional Value specifies save Filename, otherwise a save file window will appear.

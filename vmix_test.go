@@ -312,7 +312,7 @@ func TestSetOutput2(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = vmix.SetOutput2(0)
+	err = vmix.SetOutput2(0, "Output")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -323,7 +323,7 @@ func TestSetOutput3(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = vmix.SetOutput3(0)
+	err = vmix.SetOutput3(0, "Output")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -334,7 +334,7 @@ func TestSetOutput4(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = vmix.SetOutput4(0)
+	err = vmix.SetOutput4(0, "Output")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -345,7 +345,7 @@ func TestSetOutputExternal2(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = vmix.SetOutputExternal2(0)
+	err = vmix.SetOutputExternal2(0, "Output")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -356,7 +356,7 @@ func TestSetOutputFullscreen(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = vmix.SetOutputFullscreen(0)
+	err = vmix.SetOutputFullscreen(0, "Output")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -367,7 +367,7 @@ func TestSetOutputFullscreen2(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = vmix.SetOutputFullscreen2(0)
+	err = vmix.SetOutputFullscreen2(0, "Output")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -5,15 +5,14 @@ import (
 )
 
 func (v *Vmix) sendTransition(transition string, input interface{}, duration uint) error {
-	in, err := resolveInput(input)
-	if err != nil {
-		return err
-	}
-	if err := v.SendFunction(transition, nil); err != nil {
-		return err
-	}
 	params := make(map[string]string)
-	params["Input"] = in
+	if input != nil {
+		in, err := resolveInput(input)
+		if err != nil {
+			return err
+		}
+		params["Input"] = in
+	}
 	params["Duration"] = strconv.Itoa(int(duration))
 	if err := v.SendFunction(transition, params); err != nil {
 		return err

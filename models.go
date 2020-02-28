@@ -48,8 +48,10 @@ type Vmix struct {
 func (v *Vmix) SendFunction(funcname string, params map[string]string) error {
 	q := v.Addr.Query()
 	q.Add("Function", funcname)
-	for k, v := range params {
-		q.Add(k, v)
+	if params != nil {
+		for k, v := range params {
+			q.Add(k, v)
+		}
 	}
 	req := *v.Addr
 	url := q.Encode()

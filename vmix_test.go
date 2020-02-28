@@ -240,3 +240,59 @@ func TestSendKeys(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// ndi.go
+func TestNDICommand(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.NDICommand(0, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestNDISelectSourceByIndex(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.NDISelectSourceByIndex(0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestNDISelectSourceByName(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.NDISelectSourceByName(0, "NDI")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestNDIStartRecording(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.NDIStartRecording(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestNDIStopRecording(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.NDIStopRecording(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}

@@ -58,6 +58,9 @@ func (v *Vmix) SendFunction(funcname string, params map[string]string) error {
 	if err != nil {
 		return fmt.Errorf("Failed to send function... %v", err)
 	}
+	if resp.StatusCode == http.StatusInternalServerError {
+		return fmt.Errorf("vMix returned Internal error")
+	}
 	_, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("Failed to Read body... %v", err)

@@ -636,3 +636,62 @@ func TestSavePreset(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// script.go
+func TestScriptStart(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.ScriptStart("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestScriptStartDynamic(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.ScriptStartDynamic(`Function=Cut
+Sleep 1000
+Function=OverlayInput1Out
+`)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestScriptStop(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.ScriptStop("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestScriptStopAll(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.ScriptStopAll()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestScriptStopDynamic(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.ScriptStopDynamic()
+	if err != nil {
+		t.Fatal(err)
+	}
+}

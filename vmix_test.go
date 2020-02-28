@@ -17,29 +17,6 @@ func TestRefresh(t *testing.T) {
 	}
 }
 
-// transition.go
-func TestCut(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = vmix.Cut(nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestFade(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = vmix.Fade(nil, 500)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 //browser.go
 func TestBrowserBack(t *testing.T) {
 	vmix, err := NewVmix("http://localhost:8088")
@@ -691,6 +668,392 @@ func TestScriptStopDynamic(t *testing.T) {
 		t.Fatal(err)
 	}
 	err = vmix.ScriptStopDynamic()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// transition.go
+func TestFade(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Fade(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestZoom(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Zoom(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestWipe(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Wipe(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSlide(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Slide(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestFly(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Fly(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCrossZoom(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.CrossZoom(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestFlyRotate(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.FlyRotate(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCube(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Cube(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCubeZoom(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.CubeZoom(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestVerticalWipe(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.VerticalWipe(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestVerticalSlide(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.VerticalSlide(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestMerge(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Merge(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestWipeReverse(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.WipeReverse(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSlideReverse(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SlideReverse(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestVerticalWipeReverse(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.VerticalWipeReverse(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestVerticalSlideReverse(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.VerticalSlideReverse(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCut(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Cut(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCutDirect(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.CutDirect(nil, 500)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestFadeToBlack(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.FadeToBlack()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestQuickPlay(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.QuickPlay(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetFader(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetFader(255)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetTransitionDuration1(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetTransitionDuration1(300)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetTransitionDuration2(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetTransitionDuration2(300)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetTransitionDuration3(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetTransitionDuration3(300)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetTransitionDuration4(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetTransitionDuration4(300)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetTransitionEffect1(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetTransitionEffect1("Cut")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetTransitionEffect2(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetTransitionEffect2("Fade")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetTransitionEffect3(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetTransitionEffect3("Merge")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetTransitionEffect4(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetTransitionEffect4("Wipe")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStinger1(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Stinger1(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStinger2(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Stinger2(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTransition1(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Transition1()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTransition2(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Transition2()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTransition3(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Transition3()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTransition4(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.Transition4()
 	if err != nil {
 		t.Fatal(err)
 	}

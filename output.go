@@ -57,7 +57,7 @@ func (v *Vmix) Snapshot(savedir string) error {
 }
 
 // SnapshotInput Create a snapshot iamge of the selected Output. Optional Value specifies save Filename, otherwise a save file window will appear.
-func (v *Vmix) SnapshotInput(savedir string, input interface{}) error {
+func (v *Vmix) SnapshotInput(input interface{}, savedir string) error {
 	params := make(map[string]string)
 	params["Value"] = savedir
 	in, err := resolveInput(input)

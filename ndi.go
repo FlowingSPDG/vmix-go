@@ -13,7 +13,7 @@ func (v *Vmix) NDICommand(input interface{}, command string) error {
 		return err
 	}
 	params["Input"] = in
-	return v.SendFunction("NDICommand", nil)
+	return v.SendFunction("NDICommand", params)
 }
 
 // NDISelectSourceByIndex Index 0~100
@@ -25,7 +25,7 @@ func (v *Vmix) NDISelectSourceByIndex(input interface{}, index uint) error {
 		return err
 	}
 	params["Input"] = in
-	return v.SendFunction("NDISelectSourceByIndex", nil)
+	return v.SendFunction("NDISelectSourceByIndex", params)
 }
 
 // NDISelectSourceByName ?
@@ -37,7 +37,7 @@ func (v *Vmix) NDISelectSourceByName(input interface{}, name string) error {
 		return err
 	}
 	params["Input"] = in
-	return v.SendFunction("NDISelectSourceByName", nil)
+	return v.SendFunction("NDISelectSourceByName", params)
 }
 
 // NDIStartRecording ?
@@ -59,5 +59,5 @@ func (v *Vmix) NDIStopRecording(input interface{}) error {
 		return err
 	}
 	params["Input"] = in
-	return v.SendFunction("NDIStopRecording", nil)
+	return v.SendFunction("NDIStopRecording", params)
 }

@@ -602,3 +602,37 @@ func TestWriteDurationToRecordingLog(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// preset.go
+func TestLastPreset(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.LastPreset()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestOpenPreset(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.OpenPreset("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSavePreset(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SavePreset("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}

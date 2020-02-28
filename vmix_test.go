@@ -128,3 +128,70 @@ func TestBrowserReload(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// datasources.go
+func TestDataSourceAutoNextOff(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.DataSourceAutoNextOff("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDataSourceAutoNextOn(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.DataSourceAutoNextOn("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDataSourceAutoNextOnOff(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.DataSourceAutoNextOnOff("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDataSourceNextRow(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.DataSourceNextRow("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDataSourcePreviousRow(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.DataSourcePreviousRow("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDataSourceSelectRow(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.DataSourceSelectRow("")
+	if err != nil {
+		t.Fatal(err)
+	}
+}

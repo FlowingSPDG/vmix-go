@@ -195,3 +195,48 @@ func TestDataSourceSelectRow(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// general.go
+func TestActivatorRefresh(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.ActivatorRefresh()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCallManagerShowHide(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.CallManagerShowHide()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestKeyPress(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.KeyPress("A")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSendKeys(t *testing.T) {
+	vmix, err := NewVmix("http://localhost:8088")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SendKeys("{ENTER}")
+	if err != nil {
+		t.Fatal(err)
+	}
+}

@@ -71,24 +71,24 @@ func (v *Vmix) SendFunction(funcname string, params map[string]string) error {
 }
 
 // Refresh Inputs
-func (v *Vmix) Refresh() error {
+func (v *Vmix) Refresh() (*Vmix, error) {
 	resp, err := http.Get(v.Addr.String())
 	if err != nil {
-		return fmt.Errorf("Failed to connect vmix... %v", err)
+		return nil, fmt.Errorf("Failed to connect vmix... %v", err)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("Failed to Read body... %v", err)
+		return nil, fmt.Errorf("Failed to Read body... %v", err)
 	}
 	vnew := Vmix{}
 	//fmt.Printf("body : %v\n", string(body))
 	err = xml.Unmarshal(body, &vnew)
 	if err != nil {
-		return fmt.Errorf("Failed to unmarshal XML... %v", err)
+		return nil, fmt.Errorf("Failed to unmarshal XML... %v", err)
 	}
 	vnew.Addr = v.Addr
 	v = &vnew
-	return nil
+	return v, nil
 }
 
 type Input struct {

@@ -11,7 +11,7 @@ func TestRefresh(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = vmix.Refresh()
+	vmix, err = vmix.Refresh()
 	if err != nil {
 		t.Fatal(err)
 	}

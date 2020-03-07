@@ -86,6 +86,7 @@ func (v *Vmix) Refresh() error {
 	if err != nil {
 		return fmt.Errorf("Failed to unmarshal XML... %v", err)
 	}
+	vnew.Addr = v.Addr
 	v = &vnew
 	return nil
 }

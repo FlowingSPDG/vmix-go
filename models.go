@@ -82,7 +82,7 @@ func (v *Vmix) Refresh() error {
 	}
 	vnew := Vmix{}
 	//fmt.Printf("body : %v\n", string(body))
-	err = xml.Unmarshal(body, &v)
+	err = xml.Unmarshal(body, &vnew)
 	if err != nil {
 		return fmt.Errorf("Failed to unmarshal XML... %v", err)
 	}

@@ -101,12 +101,12 @@ type Input struct {
 	ShortTitle string `xml:"shorttite,attr"`
 	State      string `xml:"state,attr"` // Paused | Running
 	Position   uint   `xml:"position,attr"`
-	Duration   int   `xml:"duration,attr"`
+	Duration   int    `xml:"duration,attr"`
 	Loop       bool   `xml:"loop,attr"`
 
 	// Sound related
 	Muted       bool    `xml:"muted,attr"`
-	Volume      uint    `xml:"volume,attr"`
+	Volume      float64 `xml:"volume,attr"`
 	Balance     uint    `xml:"balance,attr"`
 	Solo        bool    `xml:"solo,attr"`
 	AudioBusses string  `xml:"audiobusses,attr"`

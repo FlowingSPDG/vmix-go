@@ -100,14 +100,14 @@ type Input struct {
 	Title      string `xml:"title,attr"` // same as Name??
 	ShortTitle string `xml:"shorttite,attr"`
 	State      string `xml:"state,attr"` // Paused | Running
-	Position   uint   `xml:"position,attr"`
+	Position   int    `xml:"position,attr"`
 	Duration   int    `xml:"duration,attr"`
 	Loop       bool   `xml:"loop,attr"`
 
 	// Sound related
 	Muted       bool    `xml:"muted,attr"`
 	Volume      float64 `xml:"volume,attr"`
-	Balance     uint    `xml:"balance,attr"`
+	Balance     int     `xml:"balance,attr"`
 	Solo        bool    `xml:"solo,attr"`
 	AudioBusses string  `xml:"audiobusses,attr"`
 	MeterF1     float64 `xml:"meterF1,attr"`
@@ -119,11 +119,11 @@ type Overlay struct {
 }
 
 type Audio struct {
-	Volume           uint    `xml:"volume,attr"`
+	Volume           float64 `xml:"volume,attr"`
 	Muted            bool    `xml:"muted,attr"`
 	MeterF1          float64 `xml:"meterF1,attr"`
 	MeterF2          float64 `xml:"meterF2,attr"`
-	HeadphonesVolume uint    `xml:"headphonesVolume,attr"`
+	HeadphonesVolume float64 `xml:"headphonesVolume,attr"`
 }
 
 type Transition struct {

@@ -112,6 +112,25 @@ type Input struct {
 	AudioBusses string  `xml:"audiobusses,attr"`
 	MeterF1     float64 `xml:"meterF1,attr"`
 	MeterF2     float64 `xml:"meterF2,attr"`
+
+	// vMix Instant Replay
+	Replay      struct {
+		Text      string `xml:",chardata"`
+		Live      bool `xml:"live,attr"`
+		Recording bool `xml:"recording,attr"`
+		Events    int `xml:"events,attr"`
+		CameraA   string `xml:"cameraA,attr"`
+		CameraB   string `xml:"cameraB,attr"`
+		Speed     float64 `xml:"speed,attr"`
+		Timecode  string `xml:"timecode"` // time.Time - e.g. 2020-08-14T16:23:13.832
+	} `xml:"replay"`
+
+	// Multi view
+	Overlay []struct {
+		Text  string `xml:",chardata"`
+		Index int `xml:"index,attr"`
+		Key   string `xml:"key,attr"`
+	} `xml:"overlay"`
 }
 
 type Overlay struct {

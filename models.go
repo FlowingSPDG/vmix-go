@@ -60,6 +60,7 @@ func (v *Vmix) SendFunction(funcname string, params map[string]string) error {
 	if err != nil {
 		return fmt.Errorf("Failed to send function... %v", err)
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusInternalServerError {
 		return fmt.Errorf("vMix returned Internal error")
 	}
@@ -76,6 +77,7 @@ func (v *Vmix) Refresh() (*Vmix, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Failed to connect vmix... %v", err)
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to Read body... %v", err)

@@ -20,6 +20,7 @@ func NewVmix(addr string) (*Vmix, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Failed to connect vmix... %v", err)
 	}
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to Read body... %v", err)

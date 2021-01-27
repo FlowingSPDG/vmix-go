@@ -109,7 +109,7 @@ type Input struct {
 	// Sound related
 	Muted       bool    `xml:"muted,attr"`
 	Volume      float64 `xml:"volume,attr"`
-	Balance     int     `xml:"balance,attr"`
+	Balance     float64 `xml:"balance,attr"`
 	Solo        bool    `xml:"solo,attr"`
 	AudioBusses string  `xml:"audiobusses,attr"`
 	MeterF1     float64 `xml:"meterF1,attr"`

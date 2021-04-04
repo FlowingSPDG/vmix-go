@@ -95,16 +95,16 @@ func (v *Vmix) Refresh() (*Vmix, error) {
 
 type Input struct {
 	// Common properties
-	Name       string `xml:",chardata"`
-	Key        string `xml:"key,attr"`
-	Number     uint   `xml:"number,attr"`
-	SceneType  string `xml:"type,attr"`
-	Title      string `xml:"title,attr"` // same as Name??
-	ShortTitle string `xml:"shorttite,attr"`
-	State      string `xml:"state,attr"` // Paused | Running
-	Position   int    `xml:"position,attr"`
-	Duration   int    `xml:"duration,attr"`
-	Loop       bool   `xml:"loop,attr"`
+	Name         string `xml:",chardata"`
+	Key          string `xml:"key,attr"`
+	Number       uint   `xml:"number,attr"`
+	SceneType    string `xml:"type,attr"`
+	Title        string `xml:"title,attr"` // same as Name??
+	ShortTitle   string `xml:"shorttite,attr"`
+	State        string `xml:"state,attr"` // Paused | Running
+	AttrPosition int    `xml:"position,attr"`
+	Duration     int    `xml:"duration,attr"`
+	Loop         bool   `xml:"loop,attr"`
 
 	// Sound related
 	Muted       bool    `xml:"muted,attr"`
@@ -114,6 +114,14 @@ type Input struct {
 	AudioBusses string  `xml:"audiobusses,attr"`
 	MeterF1     float64 `xml:"meterF1,attr"`
 	MeterF2     float64 `xml:"meterF2,attr"`
+	GainDb      string  `xml:"gainDb,attr"`
+	Position    struct {
+		Text  string `xml:",chardata"`
+		PanX  string `xml:"panX,attr"`
+		PanY  string `xml:"panY,attr"`
+		ZoomX string `xml:"zoomX,attr"`
+		ZoomY string `xml:"zoomY,attr"`
+	} `xml:"position"`
 
 	// vMix Instant Replay
 	Replay struct {

@@ -2,7 +2,6 @@ package vmixgo
 
 import (
 	"fmt"
-	"reflect"
 	"strconv"
 
 	"github.com/FlowingSPDG/vmix-go/common/models"
@@ -10,19 +9,14 @@ import (
 
 // resolveInput resolves vmix keys, number, scene name to string.
 func resolveInput(input interface{}) (string, error) {
-	s := reflect.ValueOf(input)
-	if !s.IsValid() {
-		return "", fmt.Errorf("Input is nil")
-	}
-	switch s.Type().String() {
-	case "int":
-		return strconv.Itoa(input.(int)), nil
-	case "string":
-		return input.(string), nil
-	case "vmixgo.Input":
-		in := input.(models.Input)
-		return in.Key, nil
+	switch input := input.(type) {
+	case int:
+		return strconv.Itoa(input), nil
+	case string:
+		return input, nil
+	case models.Input:
+		return input.Key, nil
 	default:
-		return "", fmt.Errorf("Interface type not correct")
+		return "", fmt.Errorf("Interface type not correct(%v)", input)
 	}
 }

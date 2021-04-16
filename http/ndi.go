@@ -1,11 +1,11 @@
-package vmixgo
+package vmixhttp
 
 import (
 	"strconv"
 )
 
 // NDICommand Send specified command to NDI source
-func (v *VmixHTTPClient) NDICommand(input interface{}, command string) error {
+func (v *Client) NDICommand(input interface{}, command string) error {
 	params := make(map[string]string)
 	params["Value"] = command
 	in, err := resolveInput(input)
@@ -17,7 +17,7 @@ func (v *VmixHTTPClient) NDICommand(input interface{}, command string) error {
 }
 
 // NDISelectSourceByIndex Index 0~100
-func (v *VmixHTTPClient) NDISelectSourceByIndex(input interface{}, index uint) error {
+func (v *Client) NDISelectSourceByIndex(input interface{}, index uint) error {
 	params := make(map[string]string)
 	params["Value"] = strconv.Itoa(int(index))
 	in, err := resolveInput(input)
@@ -29,7 +29,7 @@ func (v *VmixHTTPClient) NDISelectSourceByIndex(input interface{}, index uint) e
 }
 
 // NDISelectSourceByName ?
-func (v *VmixHTTPClient) NDISelectSourceByName(input interface{}, name string) error {
+func (v *Client) NDISelectSourceByName(input interface{}, name string) error {
 	params := make(map[string]string)
 	params["Value"] = name
 	in, err := resolveInput(input)
@@ -41,7 +41,7 @@ func (v *VmixHTTPClient) NDISelectSourceByName(input interface{}, name string) e
 }
 
 // NDIStartRecording ?
-func (v *VmixHTTPClient) NDIStartRecording(input interface{}) error {
+func (v *Client) NDIStartRecording(input interface{}) error {
 	params := make(map[string]string)
 	in, err := resolveInput(input)
 	if err != nil {
@@ -52,7 +52,7 @@ func (v *VmixHTTPClient) NDIStartRecording(input interface{}) error {
 }
 
 // NDIStopRecording ?
-func (v *VmixHTTPClient) NDIStopRecording(input interface{}) error {
+func (v *Client) NDIStopRecording(input interface{}) error {
 	params := make(map[string]string)
 	in, err := resolveInput(input)
 	if err != nil {

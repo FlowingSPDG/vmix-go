@@ -1,4 +1,4 @@
-package vmixgo
+package vmixhttp
 
 import (
 	"encoding/xml"
@@ -6,12 +6,13 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 
 	"github.com/FlowingSPDG/vmix-go/common/models"
 )
 
-// VmixHTTPClient vMix HTTP API main object
-type VmixHTTPClient struct {
+// Client vMix HTTP API main object
+type Client struct {
 	addr *url.URL `xml:"-"` // vmix API destination.
 
 	// Available informations in /api endpoint (XML).
@@ -47,7 +48,7 @@ type VmixHTTPClient struct {
 }
 
 // SendFunction sends request to /api?Function=funcname&Key=Value...
-func (v *VmixHTTPClient) SendFunction(funcname string, params map[string]string) error {
+func (v *Client) SendFunction(funcname string, params map[string]string) error {
 	q := v.addr.Query()
 	q.Add("Function", funcname)
 	if params != nil {
@@ -74,7 +75,7 @@ func (v *VmixHTTPClient) SendFunction(funcname string, params map[string]string)
 }
 
 // Refresh Inputs
-func (v *VmixHTTPClient) Refresh() error {
+func (v *Client) Refresh() error {
 	resp, err := http.Get(v.addr.String())
 	if err != nil {
 		return fmt.Errorf("Failed to connect vmix... %v", err)
@@ -84,7 +85,7 @@ func (v *VmixHTTPClient) Refresh() error {
 	if err != nil {
 		return fmt.Errorf("Failed to Read body... %v", err)
 	}
-	vnew := VmixHTTPClient{}
+	vnew := Client{}
 	//fmt.Printf("body : %v\n", string(body))
 	err = xml.Unmarshal(body, &vnew)
 	if err != nil {
@@ -93,4 +94,38 @@ func (v *VmixHTTPClient) Refresh() error {
 	vnew.addr = v.addr
 	v = &vnew
 	return nil
+}
+
+// NewVmixHTTP Creates new vMix HTTP API instance
+func NewVmixHTTP(host string, port int) (*Client, error) {
+	u := &url.URL{
+		Scheme:      "http",
+		Opaque:      "",
+		User:        &url.Userinfo{},
+		Host:        fmt.Sprintf("%s:%d", host, port),
+		Path:        "",
+		RawPath:     "",
+		ForceQuery:  false,
+		RawQuery:    "",
+		Fragment:    "",
+		RawFragment: "",
+	}
+	u.Path = path.Join(u.Path, "/api")
+	resp, err := http.Get(u.String())
+	if err != nil {
+		return nil, fmt.Errorf("Failed to connect vmix... %v", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to Read body... %v", err)
+	}
+	v := Client{}
+	err = xml.Unmarshal(body, &v)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to unmarshal XML... %v", err)
+	}
+	v.addr = u
+	return &v, nil
 }

@@ -1,4 +1,4 @@
-package vmixgo
+package vmixhttp
 
 import (
 	"testing"

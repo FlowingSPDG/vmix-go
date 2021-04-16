@@ -3,14 +3,14 @@ package vmixgo
 import (
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 )
 
-// Vmix main object
-type Vmix struct {
-	Addr *url.URL `xml:"-"` // vmix API destination.
+// VmixHTTPClient vMix HTTP API main object
+type VmixHTTPClient struct {
+	addr *url.URL `xml:"-"` // vmix API destination.
 
 	// Available informations in /api endpoint (XML).
 	XMLName xml.Name `xml:"vmix"`
@@ -45,17 +45,17 @@ type Vmix struct {
 }
 
 // SendFunction sends request to /api?Function=funcname&Key=Value...
-func (v *Vmix) SendFunction(funcname string, params map[string]string) error {
-	q := v.Addr.Query()
+func (v *VmixHTTPClient) SendFunction(funcname string, params map[string]string) error {
+	q := v.addr.Query()
 	q.Add("Function", funcname)
 	if params != nil {
 		for k, v := range params {
 			q.Add(k, v)
 		}
 	}
-	req := *v.Addr
-	url := q.Encode()
-	req.RawQuery = url
+	req := *v.addr
+	queries := q.Encode()
+	req.RawQuery = queries
 	resp, err := http.Get(req.String())
 	if err != nil {
 		return fmt.Errorf("Failed to send function... %v", err)
@@ -64,7 +64,7 @@ func (v *Vmix) SendFunction(funcname string, params map[string]string) error {
 	if resp.StatusCode == http.StatusInternalServerError {
 		return fmt.Errorf("vMix returned Internal error")
 	}
-	_, err = ioutil.ReadAll(resp.Body)
+	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("Failed to Read body... %v", err)
 	}
@@ -72,25 +72,25 @@ func (v *Vmix) SendFunction(funcname string, params map[string]string) error {
 }
 
 // Refresh Inputs
-func (v *Vmix) Refresh() (*Vmix, error) {
-	resp, err := http.Get(v.Addr.String())
+func (v *VmixHTTPClient) Refresh() error {
+	resp, err := http.Get(v.addr.String())
 	if err != nil {
-		return nil, fmt.Errorf("Failed to connect vmix... %v", err)
+		return fmt.Errorf("Failed to connect vmix... %v", err)
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to Read body... %v", err)
+		return fmt.Errorf("Failed to Read body... %v", err)
 	}
-	vnew := Vmix{}
+	vnew := VmixHTTPClient{}
 	//fmt.Printf("body : %v\n", string(body))
 	err = xml.Unmarshal(body, &vnew)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal XML... %v", err)
+		return fmt.Errorf("Failed to unmarshal XML... %v", err)
 	}
-	vnew.Addr = v.Addr
+	vnew.addr = v.addr
 	v = &vnew
-	return v, nil
+	return nil
 }
 
 type Input struct {

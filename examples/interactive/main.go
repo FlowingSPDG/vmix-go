@@ -3,13 +3,15 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/FlowingSPDG/vmix-go"
+
+	vmixgo "github.com/FlowingSPDG/vmix-go/http"
 	"github.com/c-bata/go-prompt"
 )
 
 var (
 	Inputs []vmixgo.Input
-	addr   *string
+	host   *string
+	port   *int
 )
 
 func TransitionCompleter(d prompt.Document) []prompt.Suggest {
@@ -32,11 +34,13 @@ func InputCompleter(d prompt.Document) []prompt.Suggest {
 }
 
 func init() {
-	addr = flag.String("addr", "http://localhost:8088", "vMix API Address")
+	host = flag.String("host", "localhost", "vMix HTTP API host")
+	port = flag.Int("adportr", 8088, "vMix HTTP API port")
+	flag.Parse()
 }
 
 func main() {
-	vmix, err := vmixgo.NewVmix(*addr)
+	vmix, err := vmixgo.NewVmixHTTP(*host, *port)
 	if err != nil {
 		panic(err)
 	}

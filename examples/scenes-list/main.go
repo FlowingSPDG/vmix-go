@@ -2,22 +2,24 @@ package main
 
 import (
 	"flag"
-	"github.com/FlowingSPDG/vmix-go"
 	"log"
-	"time"
+
+	vmixgo "github.com/FlowingSPDG/vmix-go/http"
 )
 
 var (
-	addr *string
+	host *string
+	port *int
 )
 
 func init() {
-	addr = flag.String("addr", "http://localhost:8088", "vMix API Address")
+	host = flag.String("host", "localhost", "vMix HTTP API Host")
+	port = flag.Int("port", 8088, "vMix HTTP API Port")
 	flag.Parse()
 }
 
 func main() {
-	vmix, err := vmixgo.NewVmix(*addr)
+	vmix, err := vmixgo.NewVmixHTTP(*host, *port)
 	if err != nil {
 		panic(err)
 	}
@@ -32,28 +34,4 @@ func main() {
 	for i := 0; i < len(vmix.Transitions.Transition); i++ {
 		log.Printf("Transition %d : %v", vmix.Transitions.Transition[i].Number, vmix.Transitions.Transition[i])
 	}
-
-	err = vmix.Fade(vmix.Inputs.Input[0], 500)
-	if err != nil {
-		log.Printf("err : %v\n", err)
-	}
-	time.Sleep(time.Second)
-
-	err = vmix.Fade(0, 500)
-	if err != nil {
-		log.Printf("err : %v\n", err)
-	}
-	time.Sleep(time.Second)
-
-	err = vmix.Fade("474e6346-1ea3-468c-8f93-70add19c354f", 500)
-	if err != nil {
-		log.Printf("err : %v\n", err)
-	}
-	time.Sleep(time.Second)
-
-	err = vmix.Fade(nil, 500)
-	if err != nil {
-		log.Printf("err : %v\n", err)
-	}
-	time.Sleep(time.Second)
 }

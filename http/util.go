@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+
+	"github.com/FlowingSPDG/vmix-go/common/models"
 )
 
 // resolveInput resolves vmix keys, number, scene name to string.
@@ -18,7 +20,7 @@ func resolveInput(input interface{}) (string, error) {
 	case "string":
 		return input.(string), nil
 	case "vmixgo.Input":
-		in := input.(Input)
+		in := input.(models.Input)
 		return in.Key, nil
 	default:
 		return "", fmt.Errorf("Interface type not correct")

@@ -4,12 +4,14 @@ import (
 	"flag"
 	"fmt"
 
-	vmixgo "github.com/FlowingSPDG/vmix-go/http"
 	"github.com/c-bata/go-prompt"
+
+	"github.com/FlowingSPDG/vmix-go/common/models"
+	vmixhttp "github.com/FlowingSPDG/vmix-go/http"
 )
 
 var (
-	Inputs []vmixgo.Input
+	Inputs []models.Input
 	host   *string
 	port   *int
 )
@@ -40,7 +42,7 @@ func init() {
 }
 
 func main() {
-	vmix, err := vmixgo.NewVmixHTTP(*host, *port)
+	vmix, err := vmixhttp.NewClient(*host, *port)
 	if err != nil {
 		panic(err)
 	}

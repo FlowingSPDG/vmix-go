@@ -96,8 +96,8 @@ func (v *Client) Refresh() error {
 	return nil
 }
 
-// NewVmixHTTP Creates new vMix HTTP API instance
-func NewVmixHTTP(host string, port int) (*Client, error) {
+// NewClient Creates new vMix HTTP API instance
+func NewClient(host string, port int) (*Client, error) {
 	u := &url.URL{
 		Scheme:      "http",
 		Opaque:      "",

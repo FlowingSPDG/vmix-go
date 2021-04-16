@@ -19,7 +19,7 @@ func init() {
 }
 
 func main() {
-	vmix, err := vmixgo.NewVmixHTTP(*host, *port)
+	vmix, err := vmixgo.NewClient(*host, *port)
 	if err != nil {
 		panic(err)
 	}

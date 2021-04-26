@@ -2,8 +2,9 @@ package main
 
 import (
 	"log"
+	"time"
 
-	vmixtcp "github.com/FlowingSPDG/vmix-go-TCP"
+	vmixtcp "github.com/FlowingSPDG/vmix-go/tcp"
 )
 
 func main() {
@@ -11,41 +12,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer v.Close()
-
-	resp1, err := v.TALLY()
+	x, err := v.XML()
 	if err != nil {
 		panic(err)
 	}
-	log.Printf("TALLY RESPONSE1 : %s\n", resp1)
+	log.Println("XML:", x)
 
-	resp, err := v.XML()
-	if err != nil {
-		panic(err)
-	}
-	log.Printf("XML RESPONSE : %s\n", resp)
-
-	// If you want to parse XML, Comment-out following code to parse it
-	// https://github.com/FlowingSPDG/vmix-go/blob/master/models.go#L12-L45
-	//
-	/*
-		import {
-			"encoding/xml"
-			vmixgo "github.com/FlowingSPDG/vmix-go"
-		}
-		v := vmixgo.Vmix{}
-		if err := xml.Unmarshal([]byte(resp), &v); err != nil {
-			return err
-		}
-	*/
-
-	resp1, err = v.FUNCTION("PreviewInput Input=1")
-	if err != nil {
-		panic(err)
-	}
-	log.Printf("FUNCTION RESPONSE : %s\n", resp1)
-
-	if err := v.QUIT(); err != nil {
+	s, err := v.SUBSCRIBE(vmixtcp.EVENT_ACTS)
+	log.Println("SUBSCRIBE:", s)
+	v.Register(vmixtcp.EVENT_ACTS, func(r *vmixtcp.Response) {
+		log.Println("ACT:", r)
+	})
+	time.Sleep(time.Second * 5)
+	if err := v.Close(); err != nil {
 		panic(err)
 	}
 }

@@ -2,6 +2,7 @@ package vmixtcp
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -18,12 +19,12 @@ const (
 
 // Vmix main object
 type Vmix struct {
-	conn      net.Conn
-	subscribe net.Conn
-	cbhandler map[string][]func(*Response)
+	conn       net.Conn
+	subscriber net.Conn
+	cbhandler  map[string][]func(*Response)
 }
 
-// New vmix instance
+// New vmix instance. TODO:Support context
 func New(dest string) (*Vmix, error) {
 	vmix := &Vmix{}
 	vmix.cbhandler = make(map[string][]func(*Response))
@@ -52,42 +53,14 @@ func New(dest string) (*Vmix, error) {
 	if err != nil {
 		return nil, err
 	}
-	vmix.subscribe = subscriber
-
-	go func() {
-		reader := bufio.NewReader(subscriber)
-		for {
-			data, err := reader.ReadString('\n')
-			if err == io.EOF {
-				panic(err)
-			}
-			if err != nil {
-				log.Printf("Unknown error on subscriber : %v\n", err)
-				continue
-			}
-			data = strings.ReplaceAll(data, Terminate, " ")
-			// log.Println("SUBSCRIBER DATA :", data)
-			responses := strings.Split(string(data), " ") // Split response by space
-			if len(responses) < 3 {
-				log.Println("Unknown length data :", responses)
-				continue
-			}
-			resp := &Response{}
-			resp.Command = responses[0]
-			resp.StatusOrLength = responses[1]
-			resp.Response = responses[2]
-			if len(responses) >= 4 {
-				resp.Data = responses[3]
-			}
-			if v, ok := vmix.cbhandler[resp.Command]; ok {
-				for _, f := range v {
-					go f(resp)
-				}
-			}
-		}
-	}()
+	vmix.subscriber = subscriber
 
 	return vmix, nil
+}
+
+func (v *Vmix) Write(b []byte) (n int, err error) {
+	fmt.Printf("Sending %s\n", b)
+	return v.conn.Write(append(b, []byte(Terminate)...))
 }
 
 // Close connection
@@ -98,10 +71,56 @@ func (v *Vmix) Close() error {
 	if err := v.conn.Close(); err != nil {
 		return err
 	}
-	if err := v.subscribe.Close(); err != nil {
+	if err := v.subscriber.Close(); err != nil {
 		return err
 	}
 	return nil
+}
+
+// Run start
+func (v *Vmix) Run(ctx context.Context) error {
+	log.Println("RUNNING")
+	reader := bufio.NewReader(v.subscriber)
+	for {
+		data, err := reader.ReadString('\n')
+		if err == io.EOF {
+			log.Println("EOF")
+			return err
+		} else if err != nil {
+			log.Printf("Unknown error on subscriber : %v\n", err)
+			return err
+		}
+		data = strings.ReplaceAll(data, Terminate, " ")
+		log.Println("SUBSCRIBER DATA :", data)
+		responses := strings.Split(string(data), " ") // Split response by space
+		if len(responses) < 3 {
+			log.Println("Unknown length data :", responses)
+			continue
+		}
+		resp := &Response{}
+		resp.Command = responses[0]
+		resp.StatusOrLength = responses[1]
+		resp.Response = responses[2]
+		if len(responses) >= 4 {
+			resp.Data = responses[3]
+		}
+		if v, ok := v.cbhandler[resp.Command]; ok {
+			for _, f := range v {
+				go f(resp)
+			}
+		}
+
+		select {
+		case <-ctx.Done():
+			log.Println("DONE")
+			if err := v.Close(); err != nil {
+				return err
+			}
+			return ctx.Err()
+		default:
+			continue
+		}
+	}
 }
 
 // XML Gets XML data. Same as HTTP API.
@@ -123,6 +142,26 @@ func (v *Vmix) XML() (string, error) {
 	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 	BodyLength, _ := v.conn.Read(BodyBuffer)
 	return string(BodyBuffer[:BodyLength]), nil
+}
+
+// XMLPATH Gets XML data from specified XPATH
+func (v *Vmix) XMLPATH(xpath string) (string, error) {
+	_, err := v.conn.Write([]byte(EVENT_XMLTEXT + " " + xpath + Terminate))
+	if err != nil {
+		return "", err
+	}
+	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+	RespBuffer := make([]byte, 1024)
+	RespLength, _ := v.conn.Read(RespBuffer)
+
+	Resp := strings.ReplaceAll(string(RespBuffer[:RespLength]), Terminate, "")
+	Resps := strings.Split(Resp, " ")
+
+	if Resps[1] != "OK" {
+		return "", fmt.Errorf("Unknown ERR : %v", Resps[3:])
+	}
+
+	return Resp, nil
 }
 
 // TALLY Get tally status
@@ -167,13 +206,13 @@ func (v *Vmix) FUNCTION(funcname string) (string, error) {
 
 // SUBSCRIBE Event
 func (v *Vmix) SUBSCRIBE(command string) (string, error) {
-	_, err := v.subscribe.Write([]byte(fmt.Sprintf("%s %s%s", EVENT_SUBSCRIBE, command, Terminate)))
+	_, err := v.subscriber.Write([]byte(fmt.Sprintf("%s %s%s", EVENT_SUBSCRIBE, command, Terminate)))
 	if err != nil {
 		return "", err
 	}
 	// c.SetReadDeadline(time.Now().Add(2 * time.Second))
 	RespBuffer := make([]byte, 1024)
-	RespLength, _ := v.subscribe.Read(RespBuffer)
+	RespLength, _ := v.subscriber.Read(RespBuffer)
 
 	Resp := strings.ReplaceAll(string(RespBuffer[:RespLength]), Terminate, "")
 	Resps := strings.Split(Resp, " ")
@@ -181,20 +220,19 @@ func (v *Vmix) SUBSCRIBE(command string) (string, error) {
 	if Resps[1] != "OK" {
 		return "", fmt.Errorf("Unknown ERR : %v", Resps[3:])
 	}
-	v.subscribe = v.subscribe
 
 	return Resp, nil
 }
 
 // UNSUBSCRIBE from event.
 func (v *Vmix) UNSUBSCRIBE(command string) (string, error) {
-	_, err := v.subscribe.Write([]byte(fmt.Sprintf("%s %s%s", EVENT_UNSUBSCRIBE, command, Terminate)))
+	_, err := v.subscriber.Write([]byte(fmt.Sprintf("%s %s%s", EVENT_UNSUBSCRIBE, command, Terminate)))
 	if err != nil {
 		return "", err
 	}
 	// c.SetReadDeadline(time.Now().Add(2 * time.Second))
 	RespBuffer := make([]byte, 1024)
-	RespLength, _ := v.subscribe.Read(RespBuffer)
+	RespLength, _ := v.subscriber.Read(RespBuffer)
 
 	Resp := strings.ReplaceAll(string(RespBuffer[:RespLength]), Terminate, "")
 	Resps := strings.Split(Resp, " ")
@@ -220,6 +258,9 @@ func (v *Vmix) QUIT() error {
 	Resps := strings.Split(Resp, " ")
 
 	// check slice length
+	if len(Resps) < 2 {
+		return fmt.Errorf("Unknown response length : %v", Resps)
+	}
 	if Resps[1] != "OK" {
 		return fmt.Errorf("Unknown ERR : %v", Resps[3:])
 	}

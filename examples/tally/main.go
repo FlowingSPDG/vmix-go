@@ -1,13 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
+	"time"
 
 	vmixtcp "github.com/FlowingSPDG/vmix-go/tcp"
-)
-
-var (
-	lock chan struct{}
 )
 
 func main() {
@@ -27,5 +25,16 @@ func main() {
 	v.Register(vmixtcp.EVENT_TALLY, func(res *vmixtcp.Response) {
 		log.Println("TALLY STATUS :", res)
 	})
+
+	lock := make(chan struct{})
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() {
+		for err := v.Run(ctx); err != nil; {
+			// reconnect
+			time.Sleep(time.Second)
+			v.Run(ctx)
+		}
+	}()
 	<-lock
 }

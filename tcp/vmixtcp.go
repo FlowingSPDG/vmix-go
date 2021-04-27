@@ -91,7 +91,7 @@ func (v *Vmix) Run(ctx context.Context) error {
 			return err
 		}
 		data = strings.ReplaceAll(data, Terminate, " ")
-		log.Println("SUBSCRIBER DATA :", data)
+		// log.Println("SUBSCRIBER DATA :", data)
 		responses := strings.Split(string(data), " ") // Split response by space
 		if len(responses) < 3 {
 			log.Println("Unknown length data :", responses)

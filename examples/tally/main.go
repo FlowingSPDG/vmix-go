@@ -19,8 +19,9 @@ func main() {
 		}
 
 		// re-subscribe
-		s, err := v.SUBSCRIBE(vmixtcp.EVENT_TALLY)
-		log.Println("SUBSCRIBE:", s)
+		if err := v.SUBSCRIBE(vmixtcp.EVENT_TALLY, ""); err != nil {
+			return err
+		}
 		v.Register(vmixtcp.EVENT_TALLY, func(r *vmixtcp.Response) {
 			log.Println("TALLY:", r)
 		})

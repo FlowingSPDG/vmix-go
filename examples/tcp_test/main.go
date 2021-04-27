@@ -19,31 +19,34 @@ func main() {
 		}
 
 		// re-subscribe
-		s, err := v.SUBSCRIBE(vmixtcp.EVENT_ACTS)
-		log.Println("SUBSCRIBE:", s)
+		if err := v.SUBSCRIBE(vmixtcp.EVENT_ACTS, ""); err != nil {
+			panic(err)
+		}
+
 		v.Register(vmixtcp.EVENT_ACTS, func(r *vmixtcp.Response) {
 			log.Println("ACT:", r)
+			if err := v.XML(); err != nil {
+				panic(err)
+			}
+		})
+
+		v.Register(vmixtcp.EVENT_XML, func(r *vmixtcp.Response) {
+			log.Println("XML:", r)
 		})
 		// timeout
 		time.Sleep(time.Second)
 
-		x, err := v.XML()
-		if err != nil {
+		if err := v.XML(); err != nil {
 			panic(err)
 		}
-		log.Println("XML:", x)
 
-		xpathPreview, err := v.XMLPATH("vmix/preview")
-		if err != nil {
+		if err := v.XMLPATH("vmix/preview"); err != nil {
 			panic(err)
 		}
-		log.Println("XPATH vmix/preview:", xpathPreview)
 
-		xpathProgram, err := v.XMLPATH("vmix/active")
-		if err != nil {
+		if err := v.XMLPATH("vmix/active"); err != nil {
 			panic(err)
 		}
-		log.Println("XPATH vmix/preview:", xpathProgram)
 
 		// run
 		return v.Run(context.TODO())

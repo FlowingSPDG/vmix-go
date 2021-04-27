@@ -130,18 +130,27 @@ func (v *Vmix) XML() (string, error) {
 		return "", err
 	}
 	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-	RespBuffer := make([]byte, 1024)
-	RespLength, _ := v.conn.Read(RespBuffer)
-	Resp := strings.Split(string(RespBuffer[:RespLength]), Terminate)
-	size, err := strconv.Atoi(strings.ReplaceAll(Resp[0], "XML ", "")) // get XML size
+	sc := bufio.NewScanner(v.conn)
+	sc.Scan()
+	Resp := strings.Split(sc.Text(), " ")
+	if len(Resp) != 2 {
+		return "", fmt.Errorf("Unknown XML Response: %v", Resp)
+	}
+	size, err := strconv.Atoi(Resp[1]) // get XML size
 	if err != nil {
 		return "", fmt.Errorf("Unknown XML Response: %v", Resp)
 	}
 
 	BodyBuffer := make([]byte, size) // allocate memory
 	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-	BodyLength, _ := v.conn.Read(BodyBuffer)
-	return string(BodyBuffer[:BodyLength]), nil
+	BodyLength, err := v.conn.Read(BodyBuffer)
+	if err != nil {
+		return "", err
+	}
+	if size != BodyLength {
+		return "", fmt.Errorf("Unknown length. Specified:%d Exact:%d", size, BodyLength)
+	}
+	return string(BodyBuffer), nil
 }
 
 // XMLPATH Gets XML data from specified XPATH

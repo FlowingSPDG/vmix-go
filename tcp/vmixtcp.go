@@ -4,24 +4,16 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"strconv"
 	"strings"
-	"time"
-)
-
-const (
-	// Terminate letter
-	Terminate = "\r\n"
 )
 
 // Vmix main object
 type Vmix struct {
-	conn       net.Conn
-	subscriber net.Conn
-	cbhandler  map[string][]func(*Response)
+	conn      net.Conn
+	cbhandler map[string][]func(*Response)
 }
 
 // New vmix instance. TODO:Support context
@@ -33,86 +25,121 @@ func New(dest string) (*Vmix, error) {
 		return nil, err
 	}
 
-	c.SetReadDeadline(time.Now().Add(2 * time.Second))
-	RespBuffer := make([]byte, 1024)
-	RespLength, _ := c.Read(RespBuffer)
-
-	Resp := strings.ReplaceAll(string(RespBuffer[:RespLength]), Terminate, "")
-	Resps := strings.Split(Resp, " ")
-
-	if Resps[1] != "OK" {
-		return nil, fmt.Errorf("Unknown ERR : %v", Resps[2:])
-	}
-
-	log.Printf("vMix TCP API Initialized... : %s\n", Resp)
-
 	vmix.conn = c
-
-	// SUBSCRIBE related...
-	subscriber, err := net.Dial("tcp", dest+":8099")
-	if err != nil {
-		return nil, err
-	}
-	vmix.subscriber = subscriber
 
 	return vmix, nil
 }
 
-func (v *Vmix) Write(b []byte) (n int, err error) {
-	fmt.Printf("Sending %s\n", b)
-	return v.conn.Write(append(b, []byte(Terminate)...))
-}
-
-// Close connection
-func (v *Vmix) Close() error {
-	if err := v.QUIT(); err != nil {
-		return err
-	}
-	if err := v.conn.Close(); err != nil {
-		return err
-	}
-	if err := v.subscriber.Close(); err != nil {
-		return err
-	}
-	return nil
-}
-
-// Run start
+// Run Start vMix TCP API Instance
 func (v *Vmix) Run(ctx context.Context) error {
-	log.Println("RUNNING")
-	reader := bufio.NewReader(v.subscriber)
+	r := bufio.NewReader(v.conn)
 	for {
-		data, err := reader.ReadString('\n')
-		if err == io.EOF {
-			log.Println("EOF")
+		var prefix bool
+		var line []byte
+		var err error
+		line, prefix, err = r.ReadLine()
+		if err != nil {
+			log.Println("Failed to read line:", err)
 			return err
-		} else if err != nil {
-			log.Printf("Unknown error on subscriber : %v\n", err)
-			return err
 		}
-		data = strings.ReplaceAll(data, Terminate, " ")
-		// log.Println("SUBSCRIBER DATA :", data)
-		responses := strings.Split(string(data), " ") // Split response by space
-		if len(responses) < 3 {
-			log.Println("Unknown length data :", responses)
-			continue
-		}
-		resp := &Response{}
-		resp.Command = responses[0]
-		resp.StatusOrLength = responses[1]
-		resp.Response = responses[2]
-		if len(responses) >= 4 {
-			resp.Data = responses[3]
-		}
-		if v, ok := v.cbhandler[resp.Command]; ok {
-			for _, f := range v {
-				go f(resp)
+		if prefix {
+			l, _, e := r.ReadLine()
+			if e != nil {
+				log.Println("Failed to read line:", e)
+				return e
 			}
+			line = append(line, l...)
+		}
+
+		resp := string(line)
+		// log.Println("resp:", resp)
+
+		resps := strings.Split(resp, " ")
+		if len(resps) <= 0 {
+			return fmt.Errorf("Failed to read line:%v", resps)
+		}
+		switch resps[0] {
+		case EVENT_TALLY:
+			if len(resps) != 3 {
+				log.Println("Unknown response length:", resp)
+				continue
+			}
+			for _, f := range v.cbhandler[EVENT_TALLY] {
+				go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: resps[2], Data: ""})
+			}
+		case EVENT_FUNCTION:
+			if len(resps) != 3 {
+				log.Println("Unknown response length:", resp)
+				continue
+			}
+			for _, f := range v.cbhandler[EVENT_FUNCTION] {
+				go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: resps[2], Data: ""})
+			}
+		case EVENT_ACTS:
+			if strings.HasPrefix(resp, EVENT_ACTS+" "+STATUS_ER) {
+				log.Println("Failed to load ACTS:", resp)
+				continue
+			} else if strings.HasPrefix(resp, EVENT_ACTS+" "+STATUS_OK) {
+				data := strings.ReplaceAll(resp, EVENT_ACTS+" "+STATUS_OK, "")
+				for _, f := range v.cbhandler[EVENT_ACTS] {
+					go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: data, Data: ""})
+				}
+			}
+		case EVENT_XML:
+			if len(resps) != 2 {
+				log.Println("Unknown response length:", resp)
+				continue
+			}
+			length, err := strconv.Atoi(resps[1])
+			if err != nil {
+				log.Println("Unknown parse XML length:", err)
+				continue
+			}
+			b := make([]byte, length)
+			read, err := v.conn.Read(b)
+			if err != nil {
+				log.Println("Failed to read XML", err)
+				continue
+			}
+			for _, f := range v.cbhandler[EVENT_XML] {
+				go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: string(b[:read]), Data: ""})
+			}
+		case EVENT_XMLTEXT:
+			if strings.HasPrefix(resp, EVENT_XMLTEXT+" "+STATUS_ER) {
+				log.Println("Failed to load XMLTEXT:", resp)
+				continue
+			} else if strings.HasPrefix(resp, EVENT_XMLTEXT+" "+STATUS_OK) {
+				data := strings.ReplaceAll(resp, EVENT_XMLTEXT+" "+STATUS_OK, "")
+				for _, f := range v.cbhandler[EVENT_XMLTEXT] {
+					go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: data, Data: ""})
+				}
+			}
+		case EVENT_SUBSCRIBE:
+			if len(resps) != 3 && len(resps) != 4 {
+				log.Println("Unknown response length:", resp)
+				continue
+			}
+			for _, f := range v.cbhandler[EVENT_SUBSCRIBE] {
+				r := &Response{Command: resps[0], StatusOrLength: resps[1], Response: resps[2], Data: ""}
+				if len(resps) == 4 {
+					r.Data = resps[3]
+				}
+				go f(r)
+			}
+		case EVENT_UNSUBSCRIBE:
+			if len(resps) != 3 {
+				log.Println("Unknown response length:", resp)
+				continue
+			}
+			for _, f := range v.cbhandler[EVENT_UNSUBSCRIBE] {
+				go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: resps[2], Data: ""})
+			}
+			log.Println("Unknown response:", resp)
+		default:
 		}
 
 		select {
 		case <-ctx.Done():
-			log.Println("DONE")
 			if err := v.Close(); err != nil {
 				return err
 			}
@@ -123,154 +150,80 @@ func (v *Vmix) Run(ctx context.Context) error {
 	}
 }
 
-// XML Gets XML data. Same as HTTP API.
-func (v *Vmix) XML() (string, error) {
-	_, err := v.conn.Write([]byte(EVENT_XML + Terminate))
-	if err != nil {
-		return "", err
-	}
-	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-	sc := bufio.NewScanner(v.conn)
-	sc.Scan()
-	Resp := strings.Split(sc.Text(), " ")
-	if len(Resp) != 2 {
-		return "", fmt.Errorf("Unknown XML Response length: %v", Resp)
-	}
-	size, err := strconv.Atoi(Resp[1]) // get XML size
-	if err != nil {
-		return "", fmt.Errorf("Unknown XML Response: %v", Resp)
-	}
+func (v *Vmix) Write(b []byte) (n int, err error) {
+	return v.conn.Write(b)
+}
 
-	BodyBuffer := make([]byte, size) // allocate memory
-	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-	_, err = v.conn.Read(BodyBuffer)
-	if err != nil {
-		return "", err
+// Close connection
+func (v *Vmix) Close() error {
+	if err := v.QUIT(); err != nil {
+		return err
 	}
-	r := strings.ReplaceAll(strings.ReplaceAll(string(BodyBuffer), string('\r'), ""), string('\n'), "")
-	return r, nil
+	if err := v.conn.Close(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// XML Gets XML data. Same as HTTP API.
+func (v *Vmix) XML() error {
+	_, err := v.conn.Write(newXMLCommand())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // XMLPATH Gets XML data from specified XPATH
-func (v *Vmix) XMLPATH(xpath string) (string, error) {
-	_, err := v.conn.Write([]byte(EVENT_XMLTEXT + " " + xpath + Terminate))
+func (v *Vmix) XMLPATH(xpath string) error {
+	_, err := v.conn.Write(newXMLTEXTCommand(xpath))
 	if err != nil {
-		return "", err
+		return err
 	}
-	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-	RespBuffer := make([]byte, 1024)
-	RespLength, _ := v.conn.Read(RespBuffer)
-
-	Resp := strings.ReplaceAll(string(RespBuffer[:RespLength]), Terminate, "")
-	Resps := strings.Split(Resp, " ")
-
-	if Resps[1] != "OK" {
-		return "", fmt.Errorf("Unknown ERR : %v", Resps[3:])
-	}
-
-	return Resp, nil
+	return nil
 }
 
 // TALLY Get tally status
-func (v *Vmix) TALLY() (string, error) {
-	_, err := v.conn.Write([]byte(EVENT_TALLY + Terminate))
+func (v *Vmix) TALLY() error {
+	_, err := v.conn.Write(newTALLYCommand())
 	if err != nil {
-		return "", err
+		return err
 	}
-	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-	RespBuffer := make([]byte, 1011) // Maximum possible length = 9 + 1000 + 2 = 1011 bytes
-	RespLength, _ := v.conn.Read(RespBuffer)
-
-	Resp := strings.ReplaceAll(string(RespBuffer[:RespLength]), Terminate, "")
-	Resps := strings.Split(Resp, " ")
-
-	if Resps[1] != "OK" {
-		return "", fmt.Errorf("Unknown ERR : %v", Resps[4:])
-	}
-
-	return Resp, nil
+	return nil
 }
 
 // FUNCTION Send function
-func (v *Vmix) FUNCTION(funcname string) (string, error) {
-	_, err := v.conn.Write([]byte(fmt.Sprintf("%s %s%s", EVENT_FUNCTION, funcname, Terminate)))
+func (v *Vmix) FUNCTION(funcname string) error {
+	_, err := v.conn.Write(newFUNCTIONCommand(funcname))
 	if err != nil {
-		return "", err
+		return err
 	}
-	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-	RespBuffer := make([]byte, 1024)
-	RespLength, _ := v.conn.Read(RespBuffer)
-
-	Resp := strings.ReplaceAll(string(RespBuffer[:RespLength]), Terminate, "")
-	Resps := strings.Split(Resp, " ")
-
-	if Resps[1] != "OK" {
-		return "", fmt.Errorf("Unknown ERR : %v", Resps[3:])
-	}
-
-	return Resp, nil
+	return nil
 }
 
 // SUBSCRIBE Event
-func (v *Vmix) SUBSCRIBE(command string) (string, error) {
-	_, err := v.subscriber.Write([]byte(fmt.Sprintf("%s %s%s", EVENT_SUBSCRIBE, command, Terminate)))
+func (v *Vmix) SUBSCRIBE(event, option string) error {
+	_, err := v.Write(newSUBSCRIBECommand(event, option))
 	if err != nil {
-		return "", err
+		return err
 	}
-	// c.SetReadDeadline(time.Now().Add(2 * time.Second))
-	RespBuffer := make([]byte, 1024)
-	RespLength, _ := v.subscriber.Read(RespBuffer)
-
-	Resp := strings.ReplaceAll(string(RespBuffer[:RespLength]), Terminate, "")
-	Resps := strings.Split(Resp, " ")
-
-	if Resps[1] != "OK" {
-		return "", fmt.Errorf("Unknown ERR : %v", Resps[3:])
-	}
-
-	return Resp, nil
+	return nil
 }
 
 // UNSUBSCRIBE from event.
-func (v *Vmix) UNSUBSCRIBE(command string) (string, error) {
-	_, err := v.subscriber.Write([]byte(fmt.Sprintf("%s %s%s", EVENT_UNSUBSCRIBE, command, Terminate)))
+func (v *Vmix) UNSUBSCRIBE(event string) error {
+	_, err := v.Write(newUNSUBSCRIBECommand(event))
 	if err != nil {
-		return "", err
+		return err
 	}
-	// c.SetReadDeadline(time.Now().Add(2 * time.Second))
-	RespBuffer := make([]byte, 1024)
-	RespLength, _ := v.subscriber.Read(RespBuffer)
-
-	Resp := strings.ReplaceAll(string(RespBuffer[:RespLength]), Terminate, "")
-	Resps := strings.Split(Resp, " ")
-
-	if Resps[1] != "OK" {
-		return "", fmt.Errorf("Unknown ERR : %v", Resps[3:])
-	}
-
-	return Resp, nil
+	return nil
 }
 
 // QUIT Sends QUIT sigal
 func (v *Vmix) QUIT() error {
-	_, err := v.conn.Write([]byte(fmt.Sprintf("%s %s", EVENT_QUIT, Terminate)))
+	_, err := v.conn.Write(newQUITCommand())
 	if err != nil {
 		return err
 	}
-	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-	RespBuffer := make([]byte, 1024)
-	RespLength, _ := v.conn.Read(RespBuffer)
-
-	Resp := strings.ReplaceAll(string(RespBuffer[:RespLength]), Terminate, "")
-	Resps := strings.Split(Resp, " ")
-
-	// check slice length
-	if len(Resps) < 2 {
-		return fmt.Errorf("Unknown response length : %v", Resps)
-	}
-	if Resps[1] != "OK" {
-		return fmt.Errorf("Unknown ERR : %v", Resps[3:])
-	}
-
 	return nil
 }

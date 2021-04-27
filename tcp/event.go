@@ -10,3 +10,8 @@ const (
 	EVENT_QUIT        string = "QUIT"
 	EVENT_ACTS        string = "ACTS"
 )
+
+const (
+	STATUS_OK string = "OK"
+	STATUS_ER string = "ER"
+)

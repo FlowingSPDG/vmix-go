@@ -134,7 +134,7 @@ func (v *Vmix) XML() (string, error) {
 	sc.Scan()
 	Resp := strings.Split(sc.Text(), " ")
 	if len(Resp) != 2 {
-		return "", fmt.Errorf("Unknown XML Response: %v", Resp)
+		return "", fmt.Errorf("Unknown XML Response length: %v", Resp)
 	}
 	size, err := strconv.Atoi(Resp[1]) // get XML size
 	if err != nil {
@@ -143,12 +143,9 @@ func (v *Vmix) XML() (string, error) {
 
 	BodyBuffer := make([]byte, size) // allocate memory
 	v.conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-	BodyLength, err := v.conn.Read(BodyBuffer)
+	_, err = v.conn.Read(BodyBuffer)
 	if err != nil {
 		return "", err
-	}
-	if size != BodyLength {
-		return "", fmt.Errorf("Unknown length. Specified:%d Exact:%d", size, BodyLength)
 	}
 	return string(BodyBuffer), nil
 }

@@ -9,32 +9,34 @@ import (
 )
 
 func main() {
-	v, err := vmixtcp.New("localhost")
-	if err != nil {
-		panic(err)
+	var v *vmixtcp.Vmix
+	retry := func() error {
+		// reconnect
+		var err error
+		v, err = vmixtcp.New("localhost")
+		if err != nil {
+			return err
+		}
+
+		// re-subscribe
+		s, err := v.SUBSCRIBE(vmixtcp.EVENT_TALLY)
+		log.Println("SUBSCRIBE:", s)
+		v.Register(vmixtcp.EVENT_TALLY, func(r *vmixtcp.Response) {
+			log.Println("TALLY:", r)
+		})
+		// timeout
+		time.Sleep(time.Second)
+
+		// run
+		return v.Run(context.TODO())
 	}
-	defer v.Close()
-
-	// Subscribe tally event
-	_, err = v.SUBSCRIBE(vmixtcp.EVENT_TALLY)
-	if err != nil {
-		panic(err)
-	}
-
-	// register callback
-	v.Register(vmixtcp.EVENT_TALLY, func(res *vmixtcp.Response) {
-		log.Println("TALLY STATUS :", res)
-	})
-
-	lock := make(chan struct{})
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	go func() {
-		for err := v.Run(ctx); err != nil; {
-			// reconnect
+		for err := retry(); err != nil; {
+			log.Println("RETRY")
 			time.Sleep(time.Second)
-			v.Run(ctx)
+			err = retry()
 		}
 	}()
+	lock := make(chan struct{})
 	<-lock
 }

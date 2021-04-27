@@ -1,5 +1,77 @@
 package models
 
+import "encoding/xml"
+
+// APIXML vMix XML API Response
+type APIXML struct {
+	XMLName xml.Name `xml:"vmix"`
+	Text    string   `xml:",chardata"`
+	Version string   `xml:"version"`
+	Edition string   `xml:"edition"`
+	Inputs  struct {
+		Text  string `xml:",chardata"`
+		Input []struct {
+			Text       string `xml:",chardata"`
+			Key        string `xml:"key,attr"`
+			Number     string `xml:"number,attr"`
+			Type       string `xml:"type,attr"`
+			Title      string `xml:"title,attr"`
+			ShortTitle string `xml:"shortTitle,attr"`
+			State      string `xml:"state,attr"`
+			Position   string `xml:"position,attr"`
+			Duration   string `xml:"duration,attr"`
+			Loop       string `xml:"loop,attr"`
+		} `xml:"input"`
+	} `xml:"inputs"`
+	Overlays struct {
+		Text    string `xml:",chardata"`
+		Overlay []struct {
+			Text   string `xml:",chardata"`
+			Number string `xml:"number,attr"`
+		} `xml:"overlay"`
+	} `xml:"overlays"`
+	Preview     string `xml:"preview"`
+	Active      string `xml:"active"`
+	FadeToBlack string `xml:"fadeToBlack"`
+	Transitions struct {
+		Text       string `xml:",chardata"`
+		Transition []struct {
+			Text     string `xml:",chardata"`
+			Number   string `xml:"number,attr"`
+			Effect   string `xml:"effect,attr"`
+			Duration string `xml:"duration,attr"`
+		} `xml:"transition"`
+	} `xml:"transitions"`
+	Recording   string `xml:"recording"`
+	External    string `xml:"external"`
+	Streaming   string `xml:"streaming"`
+	PlayList    string `xml:"playList"`
+	MultiCorder string `xml:"multiCorder"`
+	Fullscreen  string `xml:"fullscreen"`
+	Audio       struct {
+		Text   string `xml:",chardata"`
+		Master struct {
+			Text             string `xml:",chardata"`
+			Volume           string `xml:"volume,attr"`
+			Muted            string `xml:"muted,attr"`
+			MeterF1          string `xml:"meterF1,attr"`
+			MeterF2          string `xml:"meterF2,attr"`
+			HeadphonesVolume string `xml:"headphonesVolume,attr"`
+		} `xml:"master"`
+	} `xml:"audio"`
+	Dynamic struct {
+		Text   string `xml:",chardata"`
+		Input1 string `xml:"input1"`
+		Input2 string `xml:"input2"`
+		Input3 string `xml:"input3"`
+		Input4 string `xml:"input4"`
+		Value1 string `xml:"value1"`
+		Value2 string `xml:"value2"`
+		Value3 string `xml:"value3"`
+		Value4 string `xml:"value4"`
+	} `xml:"dynamic"`
+}
+
 type Input struct {
 	// Common properties
 	Name         string `xml:",chardata"`

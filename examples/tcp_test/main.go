@@ -9,41 +9,52 @@ import (
 )
 
 func main() {
-	v, err := vmixtcp.New("localhost")
-	if err != nil {
-		panic(err)
-	}
-	x, err := v.XML()
-	if err != nil {
-		panic(err)
-	}
-	log.Println("XML:", x)
+	var v *vmixtcp.Vmix
+	retry := func() error {
+		// reconnect
+		var err error
+		v, err = vmixtcp.New("localhost")
+		if err != nil {
+			return err
+		}
 
-	xpathPreview, err := v.XMLPATH("vmix/preview")
-	if err != nil {
-		panic(err)
-	}
-	log.Println("XPATH vmix/preview:", xpathPreview)
+		// re-subscribe
+		s, err := v.SUBSCRIBE(vmixtcp.EVENT_ACTS)
+		log.Println("SUBSCRIBE:", s)
+		v.Register(vmixtcp.EVENT_ACTS, func(r *vmixtcp.Response) {
+			log.Println("ACT:", r)
+		})
+		// timeout
+		time.Sleep(time.Second)
 
-	xpathProgram, err := v.XMLPATH("vmix/active")
-	if err != nil {
-		panic(err)
-	}
-	log.Println("XPATH vmix/preview:", xpathProgram)
+		x, err := v.XML()
+		if err != nil {
+			panic(err)
+		}
+		log.Println("XML:", x)
 
-	s, err := v.SUBSCRIBE(vmixtcp.EVENT_ACTS)
-	log.Println("SUBSCRIBE:", s)
-	v.Register(vmixtcp.EVENT_ACTS, func(r *vmixtcp.Response) {
-		log.Println("ACT:", r)
-	})
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+		xpathPreview, err := v.XMLPATH("vmix/preview")
+		if err != nil {
+			panic(err)
+		}
+		log.Println("XPATH vmix/preview:", xpathPreview)
+
+		xpathProgram, err := v.XMLPATH("vmix/active")
+		if err != nil {
+			panic(err)
+		}
+		log.Println("XPATH vmix/preview:", xpathProgram)
+
+		// run
+		return v.Run(context.TODO())
+	}
 	go func() {
-		for err := v.Run(ctx); err != nil; {
-			// reconnect
+		for err := retry(); err != nil; {
+			log.Println("RETRY")
 			time.Sleep(time.Second)
-			v.Run(ctx)
+			err = retry()
 		}
 	}()
-	time.Sleep(time.Second * 5)
+	lock := make(chan struct{})
+	<-lock
 }

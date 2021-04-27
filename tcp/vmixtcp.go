@@ -147,7 +147,8 @@ func (v *Vmix) XML() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(BodyBuffer), nil
+	r := strings.ReplaceAll(strings.ReplaceAll(string(BodyBuffer), string('\r'), ""), string('\n'), "")
+	return r, nil
 }
 
 // XMLPATH Gets XML data from specified XPATH

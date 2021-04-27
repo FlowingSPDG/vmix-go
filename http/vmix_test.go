@@ -1,4 +1,4 @@
-package vmixgo
+package vmixhttp
 
 import (
 	"testing"
@@ -7,19 +7,19 @@ import (
 // General vMix features
 // vmix.go or models.go
 func TestRefresh(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
-	vmix, err = vmix.Refresh()
-	if err != nil {
+
+	if err := vmix.Refresh(); err != nil {
 		t.Fatal(err)
 	}
 }
 
 //browser.go
 func TestBrowserBack(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -30,7 +30,7 @@ func TestBrowserBack(t *testing.T) {
 }
 
 func TestBrowserForward(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,7 +41,7 @@ func TestBrowserForward(t *testing.T) {
 }
 
 func TestBrowserKeyboardDisabled(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,7 @@ func TestBrowserKeyboardDisabled(t *testing.T) {
 }
 
 func TestBrowserKeyboardEnabled(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestBrowserKeyboardEnabled(t *testing.T) {
 }
 
 func TestBrowserMouseDisabled(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,7 +74,7 @@ func TestBrowserMouseDisabled(t *testing.T) {
 }
 
 func TestBrowserMouseEnabled(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,7 +85,7 @@ func TestBrowserMouseEnabled(t *testing.T) {
 }
 
 func TestBrowserNavigate(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +96,7 @@ func TestBrowserNavigate(t *testing.T) {
 }
 
 func TestBrowserReload(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -108,7 +108,7 @@ func TestBrowserReload(t *testing.T) {
 
 // datasources.go
 func TestDataSourceAutoNextOff(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,7 +119,7 @@ func TestDataSourceAutoNextOff(t *testing.T) {
 }
 
 func TestDataSourceAutoNextOn(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +130,7 @@ func TestDataSourceAutoNextOn(t *testing.T) {
 }
 
 func TestDataSourceAutoNextOnOff(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -141,7 +141,7 @@ func TestDataSourceAutoNextOnOff(t *testing.T) {
 }
 
 func TestDataSourceNextRow(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -152,7 +152,7 @@ func TestDataSourceNextRow(t *testing.T) {
 }
 
 func TestDataSourcePreviousRow(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -163,7 +163,7 @@ func TestDataSourcePreviousRow(t *testing.T) {
 }
 
 func TestDataSourceSelectRow(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -175,7 +175,7 @@ func TestDataSourceSelectRow(t *testing.T) {
 
 // general.go
 func TestActivatorRefresh(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -186,7 +186,7 @@ func TestActivatorRefresh(t *testing.T) {
 }
 
 func TestCallManagerShowHide(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -197,7 +197,7 @@ func TestCallManagerShowHide(t *testing.T) {
 }
 
 func TestKeyPress(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -208,7 +208,7 @@ func TestKeyPress(t *testing.T) {
 }
 
 func TestSendKeys(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -220,7 +220,7 @@ func TestSendKeys(t *testing.T) {
 
 // ndi.go
 func TestNDICommand(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -231,7 +231,7 @@ func TestNDICommand(t *testing.T) {
 }
 
 func TestNDISelectSourceByIndex(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -242,7 +242,7 @@ func TestNDISelectSourceByIndex(t *testing.T) {
 }
 
 func TestNDISelectSourceByName(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -253,7 +253,7 @@ func TestNDISelectSourceByName(t *testing.T) {
 }
 
 func TestNDIStartRecording(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -264,7 +264,7 @@ func TestNDIStartRecording(t *testing.T) {
 }
 
 func TestNDIStopRecording(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -276,7 +276,7 @@ func TestNDIStopRecording(t *testing.T) {
 
 // output.go
 func TestFullscreen(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -287,7 +287,7 @@ func TestFullscreen(t *testing.T) {
 }
 
 func TestFullscreenOff(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -297,7 +297,7 @@ func TestFullscreenOff(t *testing.T) {
 	}
 }
 func TestFullscreenOn(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -308,7 +308,7 @@ func TestFullscreenOn(t *testing.T) {
 }
 
 func TestSetOutput2(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -319,7 +319,7 @@ func TestSetOutput2(t *testing.T) {
 }
 
 func TestSetOutput3(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -330,7 +330,7 @@ func TestSetOutput3(t *testing.T) {
 }
 
 func TestSetOutput4(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -341,7 +341,7 @@ func TestSetOutput4(t *testing.T) {
 }
 
 func TestSetOutputExternal2(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -352,7 +352,7 @@ func TestSetOutputExternal2(t *testing.T) {
 }
 
 func TestSetOutputFullscreen(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -363,7 +363,7 @@ func TestSetOutputFullscreen(t *testing.T) {
 }
 
 func TestSetOutputFullscreen2(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -374,7 +374,7 @@ func TestSetOutputFullscreen2(t *testing.T) {
 }
 
 func TestSnapshot(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -385,7 +385,7 @@ func TestSnapshot(t *testing.T) {
 }
 
 func TestSnapshotInput(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -396,7 +396,7 @@ func TestSnapshotInput(t *testing.T) {
 }
 
 func TestStartExternal(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -407,7 +407,7 @@ func TestStartExternal(t *testing.T) {
 }
 
 func TestStartMultiCorder(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -418,7 +418,7 @@ func TestStartMultiCorder(t *testing.T) {
 }
 
 func TestStartRecording(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -429,7 +429,7 @@ func TestStartRecording(t *testing.T) {
 }
 
 func TestStartStopExternal(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -440,7 +440,7 @@ func TestStartStopExternal(t *testing.T) {
 }
 
 func TestStartStopMultiCorder(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -451,7 +451,7 @@ func TestStartStopMultiCorder(t *testing.T) {
 }
 
 func TestStartStopRecording(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -462,7 +462,7 @@ func TestStartStopRecording(t *testing.T) {
 }
 
 func TestStartStopStreaming(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -473,7 +473,7 @@ func TestStartStopStreaming(t *testing.T) {
 }
 
 func TestStartStreaming(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -484,7 +484,7 @@ func TestStartStreaming(t *testing.T) {
 }
 
 func TestStopExternal(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -495,7 +495,7 @@ func TestStopExternal(t *testing.T) {
 }
 
 func TestStopMultiCorder(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -506,7 +506,7 @@ func TestStopMultiCorder(t *testing.T) {
 }
 
 func TestStopRecording(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -517,7 +517,7 @@ func TestStopRecording(t *testing.T) {
 }
 
 func TestStopStreaming(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -528,7 +528,7 @@ func TestStopStreaming(t *testing.T) {
 }
 
 func TestStreamingSetKey(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -539,7 +539,7 @@ func TestStreamingSetKey(t *testing.T) {
 }
 
 func TestStreamingSetPassword(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -549,7 +549,7 @@ func TestStreamingSetPassword(t *testing.T) {
 	}
 }
 func TestStreamingSetURL(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -559,7 +559,7 @@ func TestStreamingSetURL(t *testing.T) {
 	}
 }
 func TestStreamingSetUsername(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -570,7 +570,7 @@ func TestStreamingSetUsername(t *testing.T) {
 }
 
 func TestWriteDurationToRecordingLog(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -582,7 +582,7 @@ func TestWriteDurationToRecordingLog(t *testing.T) {
 
 // preset.go
 func TestLastPreset(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -593,7 +593,7 @@ func TestLastPreset(t *testing.T) {
 }
 
 func TestOpenPreset(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -604,7 +604,7 @@ func TestOpenPreset(t *testing.T) {
 }
 
 func TestSavePreset(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -616,7 +616,7 @@ func TestSavePreset(t *testing.T) {
 
 // script.go
 func TestScriptStart(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -627,7 +627,7 @@ func TestScriptStart(t *testing.T) {
 }
 
 func TestScriptStartDynamic(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -641,7 +641,7 @@ Function=OverlayInput1Out
 }
 
 func TestScriptStop(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -652,7 +652,7 @@ func TestScriptStop(t *testing.T) {
 }
 
 func TestScriptStopAll(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -663,7 +663,7 @@ func TestScriptStopAll(t *testing.T) {
 }
 
 func TestScriptStopDynamic(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -675,7 +675,7 @@ func TestScriptStopDynamic(t *testing.T) {
 
 // transition.go
 func TestFade(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -686,7 +686,7 @@ func TestFade(t *testing.T) {
 }
 
 func TestZoom(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -697,7 +697,7 @@ func TestZoom(t *testing.T) {
 }
 
 func TestWipe(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -708,7 +708,7 @@ func TestWipe(t *testing.T) {
 }
 
 func TestSlide(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -719,7 +719,7 @@ func TestSlide(t *testing.T) {
 }
 
 func TestFly(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -730,7 +730,7 @@ func TestFly(t *testing.T) {
 }
 
 func TestCrossZoom(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -741,7 +741,7 @@ func TestCrossZoom(t *testing.T) {
 }
 
 func TestFlyRotate(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -752,7 +752,7 @@ func TestFlyRotate(t *testing.T) {
 }
 
 func TestCube(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -763,7 +763,7 @@ func TestCube(t *testing.T) {
 }
 
 func TestCubeZoom(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -774,7 +774,7 @@ func TestCubeZoom(t *testing.T) {
 }
 
 func TestVerticalWipe(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -785,7 +785,7 @@ func TestVerticalWipe(t *testing.T) {
 }
 
 func TestVerticalSlide(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -796,7 +796,7 @@ func TestVerticalSlide(t *testing.T) {
 }
 
 func TestMerge(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -807,7 +807,7 @@ func TestMerge(t *testing.T) {
 }
 
 func TestWipeReverse(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -818,7 +818,7 @@ func TestWipeReverse(t *testing.T) {
 }
 
 func TestSlideReverse(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -829,7 +829,7 @@ func TestSlideReverse(t *testing.T) {
 }
 
 func TestVerticalWipeReverse(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -840,7 +840,7 @@ func TestVerticalWipeReverse(t *testing.T) {
 }
 
 func TestVerticalSlideReverse(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -851,7 +851,7 @@ func TestVerticalSlideReverse(t *testing.T) {
 }
 
 func TestCut(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -862,7 +862,7 @@ func TestCut(t *testing.T) {
 }
 
 func TestCutDirect(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -873,7 +873,7 @@ func TestCutDirect(t *testing.T) {
 }
 
 func TestFadeToBlack(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -884,7 +884,7 @@ func TestFadeToBlack(t *testing.T) {
 }
 
 func TestQuickPlay(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -895,7 +895,7 @@ func TestQuickPlay(t *testing.T) {
 }
 
 func TestSetFader(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -906,7 +906,7 @@ func TestSetFader(t *testing.T) {
 }
 
 func TestSetTransitionDuration1(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -917,7 +917,7 @@ func TestSetTransitionDuration1(t *testing.T) {
 }
 
 func TestSetTransitionDuration2(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -928,7 +928,7 @@ func TestSetTransitionDuration2(t *testing.T) {
 }
 
 func TestSetTransitionDuration3(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -939,7 +939,7 @@ func TestSetTransitionDuration3(t *testing.T) {
 }
 
 func TestSetTransitionDuration4(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -950,7 +950,7 @@ func TestSetTransitionDuration4(t *testing.T) {
 }
 
 func TestSetTransitionEffect1(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -961,7 +961,7 @@ func TestSetTransitionEffect1(t *testing.T) {
 }
 
 func TestSetTransitionEffect2(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -972,7 +972,7 @@ func TestSetTransitionEffect2(t *testing.T) {
 }
 
 func TestSetTransitionEffect3(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -983,7 +983,7 @@ func TestSetTransitionEffect3(t *testing.T) {
 }
 
 func TestSetTransitionEffect4(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -994,7 +994,7 @@ func TestSetTransitionEffect4(t *testing.T) {
 }
 
 func TestStinger1(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1005,7 +1005,7 @@ func TestStinger1(t *testing.T) {
 }
 
 func TestStinger2(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1016,7 +1016,7 @@ func TestStinger2(t *testing.T) {
 }
 
 func TestTransition1(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1027,7 +1027,7 @@ func TestTransition1(t *testing.T) {
 }
 
 func TestTransition2(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1038,7 +1038,7 @@ func TestTransition2(t *testing.T) {
 }
 
 func TestTransition3(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1049,7 +1049,7 @@ func TestTransition3(t *testing.T) {
 }
 
 func TestTransition4(t *testing.T) {
-	vmix, err := NewVmix("http://localhost:8088")
+	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
 		t.Fatal(err)
 	}

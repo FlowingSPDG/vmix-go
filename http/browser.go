@@ -1,7 +1,7 @@
-package vmixgo
+package vmixhttp
 
 // BrowserBack ?
-func (v *Vmix) BrowserBack(input interface{}) error {
+func (v *Client) BrowserBack(input interface{}) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err
@@ -12,7 +12,7 @@ func (v *Vmix) BrowserBack(input interface{}) error {
 }
 
 // BrowserForward ?
-func (v *Vmix) BrowserForward(input interface{}) error {
+func (v *Client) BrowserForward(input interface{}) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err
@@ -23,7 +23,7 @@ func (v *Vmix) BrowserForward(input interface{}) error {
 }
 
 // BrowserKeyboardDisabled ?
-func (v *Vmix) BrowserKeyboardDisabled(input interface{}) error {
+func (v *Client) BrowserKeyboardDisabled(input interface{}) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err
@@ -34,7 +34,7 @@ func (v *Vmix) BrowserKeyboardDisabled(input interface{}) error {
 }
 
 // BrowserKeyboardEnabled ?
-func (v *Vmix) BrowserKeyboardEnabled(input interface{}) error {
+func (v *Client) BrowserKeyboardEnabled(input interface{}) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func (v *Vmix) BrowserKeyboardEnabled(input interface{}) error {
 }
 
 // BrowserMouseDisabled ?
-func (v *Vmix) BrowserMouseDisabled(input interface{}) error {
+func (v *Client) BrowserMouseDisabled(input interface{}) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err
@@ -56,7 +56,7 @@ func (v *Vmix) BrowserMouseDisabled(input interface{}) error {
 }
 
 // BrowserMouseEnabled ?
-func (v *Vmix) BrowserMouseEnabled(input interface{}) error {
+func (v *Client) BrowserMouseEnabled(input interface{}) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (v *Vmix) BrowserMouseEnabled(input interface{}) error {
 }
 
 // BrowserNavigate ?
-func (v *Vmix) BrowserNavigate(input interface{}, url string) error {
+func (v *Client) BrowserNavigate(input interface{}, url string) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (v *Vmix) BrowserNavigate(input interface{}, url string) error {
 }
 
 // BrowserReload ?
-func (v *Vmix) BrowserReload(input interface{}) error {
+func (v *Client) BrowserReload(input interface{}) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err

@@ -1,6 +1,6 @@
 module github.com/FlowingSPDG/vmix-go
 
-go 1.14
+go 1.16
 
 require (
 	github.com/c-bata/go-prompt v0.2.3

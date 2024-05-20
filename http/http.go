@@ -41,6 +41,11 @@ type Client struct {
 	PlayList    bool `xml:"playList"`    // Playlist enabled
 	MultiCorder bool `xml:"multiCorder"` // MultiCorder enabled
 	FullScreen  bool `xml:"fullscreen"`  // FullScreen enabled
+	Mix         []struct {
+		Number  string `xml:"number,attr"` // Mix number(2~4)
+		Preview string `xml:"preview"`
+		Active  string `xml:"active"`
+	} `xml:"mix"`
 	// Audio?
 	Audios struct {
 		Master []models.Audio `xml:"master"`

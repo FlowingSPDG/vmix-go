@@ -3,6 +3,7 @@ package models
 import "encoding/xml"
 
 // APIXML vMix XML API Response
+// Currently unused?
 type APIXML struct {
 	XMLName xml.Name `xml:"vmix"`
 	Text    string   `xml:",chardata"`
@@ -48,7 +49,13 @@ type APIXML struct {
 	PlayList    string `xml:"playList"`
 	MultiCorder string `xml:"multiCorder"`
 	Fullscreen  string `xml:"fullscreen"`
-	Audio       struct {
+	Mix         []struct {
+		Text    string `xml:",chardata"`
+		Number  string `xml:"number,attr"`
+		Preview string `xml:"preview"`
+		Active  string `xml:"active"`
+	} `xml:"mix"`
+	Audio struct {
 		Text   string `xml:",chardata"`
 		Master struct {
 			Text             string `xml:",chardata"`

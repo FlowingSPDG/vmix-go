@@ -48,7 +48,16 @@ type FunctionResponse struct {
 }
 
 type ActsResponse struct {
-	Response string // True=1 False=0 or 32bit float
+	// e.g. Following examples are for "InputPreview" command.
+	//
+	// "InputPreview 1 1"
+	// "InputPreview 1 0"
+	// "InputPreview 3 1"
+	//
+	// this means Input 1 is used for Preview(L1), and vMix changed to input 3.
+	// L2 means Input1 is no longer used for Preview.
+	// L3 means Input3 is now used for Preview.
+	Response string // True=1 False=0 or 32bit float.
 }
 
 type XMLResponse struct {

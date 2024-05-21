@@ -43,7 +43,7 @@ func main() {
 			return err
 		}
 
-		if err := v.Acts("InputPreview", 1); err != nil {
+		if err := v.Acts("InputPreview"); err != nil {
 			return err
 		}
 

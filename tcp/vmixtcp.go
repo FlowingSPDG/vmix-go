@@ -153,7 +153,11 @@ func (v *vmix) readStatus() error {
 	}
 	status = strings.TrimSpace(status)
 	if status != statusOK {
-		return ErrStatusNotOK
+		s, err := v.readLine()
+		if err != nil {
+			return err
+		}
+		return errors.Join(ErrStatusNotOK, errors.New(s))
 	}
 	return nil
 }

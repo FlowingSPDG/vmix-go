@@ -3,9 +3,10 @@ package vmixtcp
 import "fmt"
 
 const (
-	// Terminate letter
-	Terminate = "\r\n"
+	terminate = "\r\n"
 )
+
+// TODO: 専用の型定義をする
 
 const (
 	commandVersion     string = "VERSION"
@@ -30,33 +31,37 @@ const (
 	statusER string = "ER"
 )
 
+func newTallyCommand() []byte {
+	return []byte(commandTally + terminate)
+}
+
+func newFunctionCommand(name string, query string) []byte {
+	return []byte(fmt.Sprintf("%s %s %s%s", commandFunction, name, query, terminate))
+}
+
+func newActsCommand(name string, input ...int) []byte {
+	return []byte(fmt.Sprintf("%s %s %d%s", commandActs, name, input, terminate))
+}
+
 func newXMLCommand() []byte {
-	return []byte(commandXML + Terminate)
+	return []byte(commandXML + terminate)
 }
 
 func newXMLTEXTCommand(xpath string) []byte {
-	return []byte(fmt.Sprintf("%s %s%s", commandXMLText, xpath, Terminate))
+	return []byte(fmt.Sprintf("%s %s%s", commandXMLText, xpath, terminate))
 }
 
-func newTALLYCommand() []byte {
-	return []byte(commandTally + Terminate)
-}
-
-func newFUNCTIONCommand(name string) []byte {
-	return []byte(fmt.Sprintf("%s %s%s", commandFunction, name, Terminate))
-}
-
-func newSUBSCRIBECommand(event, option string) []byte {
+func newSubscribeCommand(event, option string) []byte {
 	if option != "" {
-		return []byte(fmt.Sprintf("%s %s %s%s", commandSubscribe, event, option, Terminate))
+		return []byte(fmt.Sprintf("%s %s %s%s", commandSubscribe, event, option, terminate))
 	}
-	return []byte(fmt.Sprintf("%s %s%s", commandSubscribe, event, Terminate))
+	return []byte(fmt.Sprintf("%s %s%s", commandSubscribe, event, terminate))
 }
 
-func newUNSUBSCRIBECommand(event string) []byte {
-	return []byte(fmt.Sprintf("%s %s%s", commandUnsubscribe, event, Terminate))
+func newUnsubscribeCommand(event string) []byte {
+	return []byte(fmt.Sprintf("%s %s%s", commandUnsubscribe, event, terminate))
 }
 
-func newQUITCommand() []byte {
-	return []byte(commandQuit + Terminate)
+func newQuitCommand() []byte {
+	return []byte(commandQuit + terminate)
 }

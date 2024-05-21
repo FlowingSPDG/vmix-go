@@ -13,42 +13,49 @@ import (
 func main() {
 	ctx := context.Background()
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
-	var v *vmixtcp.Vmix
+
+	// Initialize vMix
+	v := vmixtcp.New("localhost")
+	// register callback
+	v.OnVersion(func(r *vmixtcp.VersionResponse) {
+		log.Println("Version:", r.Version)
+	})
+	v.OnActs(func(r *vmixtcp.ActsResponse) {
+		log.Println("Response:", r.Response)
+	})
+	v.OnXML(func(r *vmixtcp.XMLResponse) {
+		log.Printf("XML: %#v\n", r.XML)
+	})
+
 	retry := func() error {
-		// reconnect
-		var err error
-		v, err = vmixtcp.New("localhost")
-		if err != nil {
+		// Connect TCP API
+		if err := v.Connect(); err != nil {
 			return err
 		}
-		// register callback
-		v.OnVersion(func(r *vmixtcp.VersionResponse) {
-			log.Println("Version:", r.Version)
-		})
-		v.OnActs(func(r *vmixtcp.ActsResponse) {
-			log.Println("Response:", r.Response)
-		})
-		v.OnXML(func(r *vmixtcp.XMLResponse) {
-			log.Printf("XML: %#v\n", r.XML)
-		})
 
-		// re-subscribe
+		// subscribe
 		if err := v.Subscribe(vmixtcp.EventActs, ""); err != nil {
-			panic(err)
+			return err
 		}
 
+		// Send commands
 		if err := v.XML(); err != nil {
-			panic(err)
+			return err
+		}
+
+		if err := v.Acts("InputPreview", 1); err != nil {
+			return err
 		}
 
 		// run
 		return v.Run(ctx)
 	}
 	go func() {
-		for err := retry(); err != nil; {
-			log.Println("RETRY")
-			time.Sleep(time.Second)
-			err = retry()
+		for {
+			if err := retry(); err != nil {
+				log.Println("RETRY")
+				time.Sleep(time.Second)
+			}
 		}
 	}()
 	<-ctx.Done()

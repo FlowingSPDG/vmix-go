@@ -14,18 +14,17 @@ func main() {
 	ctx := context.Background()
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 
-	var v *vmixtcp.Vmix
+	v := vmixtcp.New("localhost")
+	// register callback
+	v.OnTally(func(r *vmixtcp.TallyResponse) {
+		log.Println("TALLY:", r.Tally)
+	})
+
 	retry := func() error {
 		// reconnect
-		var err error
-		v, err = vmixtcp.New("localhost")
-		if err != nil {
+		if err := v.Connect(); err != nil {
 			return err
 		}
-		// register callback
-		v.OnTally(func(r *vmixtcp.TallyResponse) {
-			log.Println("TALLY:", r.Tally)
-		})
 
 		// re-subscribe
 		if err := v.Subscribe(vmixtcp.EventTally, ""); err != nil {
@@ -36,10 +35,11 @@ func main() {
 		return v.Run(ctx)
 	}
 	go func() {
-		for err := retry(); err != nil; {
-			log.Println("RETRY")
-			time.Sleep(time.Second)
-			err = retry()
+		for {
+			if err := retry(); err != nil {
+				log.Println("RETRY")
+				time.Sleep(time.Second)
+			}
 		}
 	}()
 	<-ctx.Done()

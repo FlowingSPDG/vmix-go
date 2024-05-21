@@ -3,37 +3,65 @@ package vmixtcp
 import "fmt"
 
 const (
-	// Terminate letter
-	Terminate = "\r\n"
+	terminate = "\r\n"
 )
 
+// TODO: 専用の型定義をする
+
+const (
+	commandVersion     string = "VERSION"
+	commandTally       string = "TALLY"
+	commandFunction    string = "FUNCTION"
+	commandXML         string = "XML"
+	commandXMLText     string = "XMLTEXT"
+	commandSubscribe   string = "SUBSCRIBE"
+	commandUnsubscribe string = "UNSUBSCRIBE"
+	commandQuit        string = "QUIT"
+	commandActs        string = "ACTS"
+)
+
+const (
+	// For SUBSCRIBE Event
+	EventTally = commandTally
+	EventActs  = commandActs
+)
+
+const (
+	statusOK string = "OK"
+	statusER string = "ER"
+)
+
+func newTallyCommand() []byte {
+	return []byte(commandTally + terminate)
+}
+
+func newFunctionCommand(name string, query string) []byte {
+	return []byte(fmt.Sprintf("%s %s %s%s", commandFunction, name, query, terminate))
+}
+
+func newActsCommand(name string, input ...int) []byte {
+	return []byte(fmt.Sprintf("%s %s %d%s", commandActs, name, input, terminate))
+}
+
 func newXMLCommand() []byte {
-	return []byte(EVENT_XML + Terminate)
+	return []byte(commandXML + terminate)
 }
 
 func newXMLTEXTCommand(xpath string) []byte {
-	return []byte(fmt.Sprintf("%s %s%s", EVENT_XMLTEXT, xpath, Terminate))
+	return []byte(fmt.Sprintf("%s %s%s", commandXMLText, xpath, terminate))
 }
 
-func newTALLYCommand() []byte {
-	return []byte(EVENT_TALLY + Terminate)
-}
-
-func newFUNCTIONCommand(name string) []byte {
-	return []byte(fmt.Sprintf("%s %s%s", EVENT_FUNCTION, name, Terminate))
-}
-
-func newSUBSCRIBECommand(event, option string) []byte {
+func newSubscribeCommand(event, option string) []byte {
 	if option != "" {
-		return []byte(fmt.Sprintf("%s %s %s%s", EVENT_SUBSCRIBE, event, option, Terminate))
+		return []byte(fmt.Sprintf("%s %s %s%s", commandSubscribe, event, option, terminate))
 	}
-	return []byte(fmt.Sprintf("%s %s%s", EVENT_SUBSCRIBE, event, Terminate))
+	return []byte(fmt.Sprintf("%s %s%s", commandSubscribe, event, terminate))
 }
 
-func newUNSUBSCRIBECommand(event string) []byte {
-	return []byte(fmt.Sprintf("%s %s%s", EVENT_UNSUBSCRIBE, event, Terminate))
+func newUnsubscribeCommand(event string) []byte {
+	return []byte(fmt.Sprintf("%s %s%s", commandUnsubscribe, event, terminate))
 }
 
-func newQUITCommand() []byte {
-	return []byte("QUIT" + Terminate)
+func newQuitCommand() []byte {
+	return []byte(commandQuit + terminate)
 }

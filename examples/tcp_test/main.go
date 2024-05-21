@@ -3,61 +3,62 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"os/signal"
 	"time"
 
 	vmixtcp "github.com/FlowingSPDG/vmix-go/tcp"
 )
 
 func main() {
-	var v *vmixtcp.Vmix
+	ctx := context.Background()
+	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
+
+	// Initialize vMix
+	v := vmixtcp.New("localhost")
+	// register callback
+	v.OnVersion(func(r *vmixtcp.VersionResponse) {
+		log.Println("Version:", r.Version)
+	})
+	v.OnActs(func(r *vmixtcp.ActsResponse) {
+		log.Println("Response:", r.Response)
+	})
+	v.OnXML(func(r *vmixtcp.XMLResponse) {
+		log.Printf("XML: %#v\n", r.XML)
+	})
+
 	retry := func() error {
-		// reconnect
-		var err error
-		v, err = vmixtcp.New("localhost")
-		if err != nil {
+		// Connect TCP API
+		if err := v.Connect(); err != nil {
 			return err
 		}
 
-		// re-subscribe
-		if err := v.SUBSCRIBE(vmixtcp.EVENT_ACTS, ""); err != nil {
-			panic(err)
+		// subscribe
+		if err := v.Subscribe(vmixtcp.EventActs, ""); err != nil {
+			return err
 		}
 
-		v.Register(vmixtcp.EVENT_ACTS, func(r *vmixtcp.Response) {
-			log.Println("ACT:", r)
-			if err := v.XML(); err != nil {
-				panic(err)
-			}
-		})
-
-		v.Register(vmixtcp.EVENT_XML, func(r *vmixtcp.Response) {
-			log.Println("XML:", r)
-		})
-		// timeout
-		time.Sleep(time.Second)
-
+		// Send commands
 		if err := v.XML(); err != nil {
-			panic(err)
+			return err
 		}
 
-		if err := v.XMLPATH("vmix/preview"); err != nil {
-			panic(err)
-		}
-
-		if err := v.XMLPATH("vmix/active"); err != nil {
-			panic(err)
+		if err := v.Acts("InputPreview", 1); err != nil {
+			return err
 		}
 
 		// run
-		return v.Run(context.TODO())
+		return v.Run(ctx)
 	}
 	go func() {
-		for err := retry(); err != nil; {
-			log.Println("RETRY")
-			time.Sleep(time.Second)
-			err = retry()
+		for {
+			if err := retry(); err != nil {
+				log.Println("RETRY")
+				time.Sleep(time.Second)
+			}
 		}
 	}()
-	lock := make(chan struct{})
-	<-lock
+	<-ctx.Done()
+	cancel()
+	log.Println("Shutting down")
 }

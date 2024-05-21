@@ -1,14 +1,34 @@
 package vmixtcp
 
-import (
-	"fmt"
-)
-
 // Register goroutine callback event.
-func (v *Vmix) Register(command string, cb func(*Response)) error {
-	if _, exist := v.cbhandler[command]; exist {
-		return fmt.Errorf("Handler exist")
-	}
-	v.cbhandler[command] = append(v.cbhandler[command], cb)
-	return nil
+func (v *Vmix) OnVersion(cb func(*VersionResponse)) {
+	v.callbacks.version = cb
+}
+
+func (v *Vmix) OnTally(cb func(*TallyResponse)) {
+	v.callbacks.tally = cb
+}
+
+func (v *Vmix) OnFunction(cb func(*FunctionResponse)) {
+	v.callbacks.function = cb
+}
+
+func (v *Vmix) OnActs(cb func(*ActsResponse)) {
+	v.callbacks.acts = cb
+}
+
+func (v *Vmix) OnXML(cb func(*XMLResponse)) {
+	v.callbacks.xml = cb
+}
+
+func (v *Vmix) OnXMLText(cb func(*XMLTextResponse)) {
+	v.callbacks.xmltext = cb
+}
+
+func (v *Vmix) OnSubscribe(cb func(*SubscribeResponse)) {
+	v.callbacks.subscribe = cb
+}
+
+func (v *Vmix) OnUnsubscribe(cb func(*UnsubscribeResponse)) {
+	v.callbacks.unsubscribe = cb
 }

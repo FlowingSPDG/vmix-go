@@ -3,12 +3,16 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"os/signal"
 	"time"
 
 	vmixtcp "github.com/FlowingSPDG/vmix-go/tcp"
 )
 
 func main() {
+	ctx := context.Background()
+	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	var v *vmixtcp.Vmix
 	retry := func() error {
 		// reconnect
@@ -17,39 +21,28 @@ func main() {
 		if err != nil {
 			return err
 		}
+		// register callback
+		v.OnVersion(func(r *vmixtcp.VersionResponse) {
+			log.Println("Version:", r.Version)
+		})
+		v.OnActs(func(r *vmixtcp.ActsResponse) {
+			log.Println("Response:", r.Response)
+		})
+		v.OnXML(func(r *vmixtcp.XMLResponse) {
+			log.Printf("XML: %#v\n", r.XML)
+		})
 
 		// re-subscribe
-		if err := v.SUBSCRIBE(vmixtcp.EVENT_ACTS, ""); err != nil {
+		if err := v.Subscribe(vmixtcp.EventActs, ""); err != nil {
 			panic(err)
 		}
-
-		v.Register(vmixtcp.EVENT_ACTS, func(r *vmixtcp.Response) {
-			log.Println("ACT:", r)
-			if err := v.XML(); err != nil {
-				panic(err)
-			}
-		})
-
-		v.Register(vmixtcp.EVENT_XML, func(r *vmixtcp.Response) {
-			log.Println("XML:", r)
-		})
-		// timeout
-		time.Sleep(time.Second)
 
 		if err := v.XML(); err != nil {
 			panic(err)
 		}
 
-		if err := v.XMLPATH("vmix/preview"); err != nil {
-			panic(err)
-		}
-
-		if err := v.XMLPATH("vmix/active"); err != nil {
-			panic(err)
-		}
-
 		// run
-		return v.Run(context.TODO())
+		return v.Run(ctx)
 	}
 	go func() {
 		for err := retry(); err != nil; {
@@ -58,6 +51,7 @@ func main() {
 			err = retry()
 		}
 	}()
-	lock := make(chan struct{})
-	<-lock
+	<-ctx.Done()
+	cancel()
+	log.Println("Shutting down")
 }

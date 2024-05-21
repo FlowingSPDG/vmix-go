@@ -3,7 +3,6 @@ package models
 import "encoding/xml"
 
 // APIXML vMix XML API Response
-// Currently unused?
 type APIXML struct {
 	XMLName xml.Name `xml:"vmix"`
 	Text    string   `xml:",chardata"`

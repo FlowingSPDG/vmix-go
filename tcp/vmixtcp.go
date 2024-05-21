@@ -3,138 +3,250 @@ package vmixtcp
 import (
 	"bufio"
 	"context"
-	"fmt"
+	"encoding/xml"
+	"errors"
+	"io"
 	"log"
 	"net"
 	"strconv"
 	"strings"
+	"sync"
+
+	"github.com/FlowingSPDG/vmix-go/common/models"
+)
+
+var (
+	ErrFailedToReadCommand = errors.New("failed to read command")
+	ErrFailedToReadStatus  = errors.New("failed to read status")
+	ErrStatusNotOK         = errors.New("status is not OK")
+	ErrFailedToReadLength  = errors.New("failed to read length")
+	ErrFailedToParseLength = errors.New("failed to parse length")
+	ErrFailedToReadXML     = errors.New("failed to read XML")
+	ErrFailedToUnmarshal   = errors.New("failed to unmarshal XML")
 )
 
 // Vmix main object
 type Vmix struct {
-	conn      net.Conn
-	cbhandler map[string][]func(*Response)
+	lock *sync.RWMutex // TODO: for goroutine safety
+	conn net.Conn      // TCP connection
+
+	callbacks callbacks
 }
 
-// New vmix instance. TODO:Support context
+type callbacks struct {
+	version     func(*VersionResponse)
+	tally       func(*TallyResponse)
+	function    func(*FunctionResponse)
+	acts        func(*ActsResponse)
+	xml         func(*XMLResponse)
+	xmltext     func(*XMLTextResponse)
+	subscribe   func(*SubscribeResponse)
+	unsubscribe func(*UnsubscribeResponse)
+}
+
+// New vmix instance.
 func New(dest string) (*Vmix, error) {
-	vmix := &Vmix{}
-	vmix.cbhandler = make(map[string][]func(*Response))
 	c, err := net.Dial("tcp", dest+":8099")
 	if err != nil {
 		return nil, err
 	}
 
-	vmix.conn = c
+	vmix := &Vmix{
+		lock: &sync.RWMutex{},
+		conn: c,
+		callbacks: callbacks{
+			version:     func(*VersionResponse) {},
+			tally:       func(*TallyResponse) {},
+			function:    func(*FunctionResponse) {},
+			acts:        func(*ActsResponse) {},
+			xml:         func(*XMLResponse) {},
+			xmltext:     func(*XMLTextResponse) {},
+			subscribe:   func(*SubscribeResponse) {},
+			unsubscribe: func(*UnsubscribeResponse) {},
+		},
+	}
 
 	return vmix, nil
+}
+
+func (v *Vmix) readCommand(rd *bufio.Reader) (string, error) {
+	command, err := rd.ReadString(' ')
+	if err != nil {
+		return "", ErrFailedToReadCommand
+	}
+	command = strings.TrimSpace(command)
+	return command, nil
+}
+
+func (v *Vmix) readStatus(rd *bufio.Reader) error {
+	status, err := rd.ReadString(' ')
+	if err != nil {
+		return ErrFailedToReadStatus
+	}
+	status = strings.TrimSpace(status)
+	if status != statusOK {
+		return ErrStatusNotOK
+	}
+	return nil
+}
+
+func (v *Vmix) readLength(rd *bufio.Reader) (int, error) {
+	length, _, err := rd.ReadLine()
+	if err != nil {
+		return 0, ErrFailedToReadLength
+	}
+	i, err := strconv.Atoi(strings.TrimSpace(string(length)))
+	if err != nil {
+		return 0, ErrFailedToParseLength
+	}
+	return i, nil
+}
+
+func (v *Vmix) readXML(length int, rd *bufio.Reader) (*models.APIXML, error) {
+	b := make([]byte, length)
+	if _, err := io.ReadFull(rd, b); err != nil {
+		return nil, ErrFailedToReadXML
+	}
+	api := models.APIXML{}
+	if err := xml.Unmarshal(b, &api); err != nil {
+		return nil, ErrFailedToUnmarshal
+	}
+	return &api, nil
 }
 
 // Run Start vMix TCP API Instance
 func (v *Vmix) Run(ctx context.Context) error {
 	r := bufio.NewReader(v.conn)
 	for {
-		var prefix bool
-		var line []byte
-		var err error
-		line, prefix, err = r.ReadLine()
+		command, err := v.readCommand(r)
 		if err != nil {
-			log.Println("Failed to read line:", err)
-			return err
-		}
-		if prefix {
-			l, _, e := r.ReadLine()
-			if e != nil {
-				log.Println("Failed to read line:", e)
-				return e
-			}
-			line = append(line, l...)
+			log.Println("Failed to read command:", err)
+			continue
 		}
 
-		resp := string(line)
-		// log.Println("resp:", resp)
+		switch command {
+		case commandVersion:
+			if err := v.readStatus(r); err != nil {
+				log.Println("Failed to read status:", err)
+				continue
+			}
+			version, _, err := r.ReadLine()
+			if err != nil {
+				log.Println("Failed to read response:", err)
+				continue
+			}
+			resp := VersionResponse{
+				Version: string(version),
+			}
+			v.callbacks.version(&resp)
 
-		resps := strings.Split(resp, " ")
-		if len(resps) <= 0 {
-			return fmt.Errorf("Failed to read line:%v", resps)
-		}
-		switch resps[0] {
-		case EVENT_TALLY:
-			if len(resps) != 3 {
-				log.Println("Unknown response length:", resp)
+		case commandTally:
+			if err := v.readStatus(r); err != nil {
+				log.Println("Failed to read status:", err)
 				continue
 			}
-			for _, f := range v.cbhandler[EVENT_TALLY] {
-				go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: resps[2], Data: ""})
-			}
-		case EVENT_FUNCTION:
-			if len(resps) != 3 {
-				log.Println("Unknown response length:", resp)
+			tallies, _, err := r.ReadLine()
+			if err != nil {
+				log.Println("Failed to read tallies:", err)
 				continue
 			}
-			for _, f := range v.cbhandler[EVENT_FUNCTION] {
-				go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: resps[2], Data: ""})
+			resp := TallyResponse{
+				Tally: encodeTallies(tallies),
 			}
-		case EVENT_ACTS:
-			if strings.HasPrefix(resp, EVENT_ACTS+" "+STATUS_ER) {
-				log.Println("Failed to load ACTS:", resp)
-				continue
-			} else if strings.HasPrefix(resp, EVENT_ACTS+" "+STATUS_OK) {
-				data := strings.ReplaceAll(resp, EVENT_ACTS+" "+STATUS_OK, "")
-				for _, f := range v.cbhandler[EVENT_ACTS] {
-					go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: data, Data: ""})
-				}
-			}
-		case EVENT_XML:
-			if len(resps) != 2 {
-				log.Println("Unknown response length:", resp)
+			v.callbacks.tally(&resp)
+
+		case commandFunction:
+			if err := v.readStatus(r); err != nil {
+				log.Println("Failed to read status:", err)
 				continue
 			}
-			length, err := strconv.Atoi(resps[1])
+			response, _, err := r.ReadLine()
+			if err != nil {
+				log.Println("Failed to read response:", err)
+				continue
+			}
+			resp := FunctionResponse{
+				Response: string(response),
+			}
+			v.callbacks.function(&resp)
+
+		case commandActs:
+			if err := v.readStatus(r); err != nil {
+				log.Println("Failed to read status:", err)
+				continue
+			}
+			response, _, err := r.ReadLine()
+			if err != nil {
+				log.Println("Failed to read response:", err)
+				continue
+			}
+			resp := ActsResponse{
+				Response: string(response),
+			}
+			v.callbacks.acts(&resp)
+
+		case commandXML:
+			length, err := v.readLength(r)
 			if err != nil {
 				log.Println("Unknown parse XML length:", err)
 				continue
 			}
-			b := make([]byte, length)
-			read, err := v.conn.Read(b)
+			api, err := v.readXML(length, r)
 			if err != nil {
-				log.Println("Failed to read XML", err)
+				log.Println("Failed to read XML:", err)
 				continue
 			}
-			for _, f := range v.cbhandler[EVENT_XML] {
-				go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: string(b[:read]), Data: ""})
+
+			resp := XMLResponse{
+				XML: api,
 			}
-		case EVENT_XMLTEXT:
-			if strings.HasPrefix(resp, EVENT_XMLTEXT+" "+STATUS_ER) {
-				log.Println("Failed to load XMLTEXT:", resp)
-				continue
-			} else if strings.HasPrefix(resp, EVENT_XMLTEXT+" "+STATUS_OK) {
-				data := strings.ReplaceAll(resp, EVENT_XMLTEXT+" "+STATUS_OK, "")
-				for _, f := range v.cbhandler[EVENT_XMLTEXT] {
-					go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: data, Data: ""})
-				}
-			}
-		case EVENT_SUBSCRIBE:
-			if len(resps) != 3 && len(resps) != 4 {
-				log.Println("Unknown response length:", resp)
+			v.callbacks.xml(&resp)
+
+		case commandXMLText:
+			if err := v.readStatus(r); err != nil {
+				log.Println("Failed to read status:", err)
 				continue
 			}
-			for _, f := range v.cbhandler[EVENT_SUBSCRIBE] {
-				r := &Response{Command: resps[0], StatusOrLength: resps[1], Response: resps[2], Data: ""}
-				if len(resps) == 4 {
-					r.Data = resps[3]
-				}
-				go f(r)
-			}
-		case EVENT_UNSUBSCRIBE:
-			if len(resps) != 3 {
-				log.Println("Unknown response length:", resp)
+			xmltext, _, err := r.ReadLine()
+			if err != nil {
+				log.Println("Failed to read XMLTEXT:", err)
 				continue
 			}
-			for _, f := range v.cbhandler[EVENT_UNSUBSCRIBE] {
-				go f(&Response{Command: resps[0], StatusOrLength: resps[1], Response: resps[2], Data: ""})
+			resp := XMLTextResponse{
+				XMLText: string(xmltext),
 			}
-			log.Println("Unknown response:", resp)
+			v.callbacks.xmltext(&resp)
+
+		case commandSubscribe:
+			if err := v.readStatus(r); err != nil {
+				log.Println("Failed to read status:", err)
+				continue
+			}
+			respCommand, _, err := r.ReadLine()
+			if err != nil {
+				log.Println("Failed to read XMLTEXT:", err)
+				continue
+			}
+			resp := SubscribeResponse{
+				Command: string(respCommand),
+			}
+			v.callbacks.subscribe(&resp)
+
+		case commandUnsubscribe:
+			if err := v.readStatus(r); err != nil {
+				log.Println("Failed to read status:", err)
+				continue
+			}
+			respCommand, _, err := r.ReadLine()
+			if err != nil {
+				log.Println("Failed to read XMLTEXT:", err)
+				continue
+			}
+			resp := UnsubscribeResponse{
+				Command: string(respCommand),
+			}
+			v.callbacks.unsubscribe(&resp)
+
 		default:
 		}
 
@@ -150,13 +262,9 @@ func (v *Vmix) Run(ctx context.Context) error {
 	}
 }
 
-func (v *Vmix) Write(b []byte) (n int, err error) {
-	return v.conn.Write(b)
-}
-
-// Close connection
+// Close connection. Calls QUIT command before connection closure.
 func (v *Vmix) Close() error {
-	if err := v.QUIT(); err != nil {
+	if err := v.Quit(); err != nil {
 		return err
 	}
 	if err := v.conn.Close(); err != nil {
@@ -175,7 +283,7 @@ func (v *Vmix) XML() error {
 }
 
 // XMLPATH Gets XML data from specified XPATH
-func (v *Vmix) XMLPATH(xpath string) error {
+func (v *Vmix) XMLPath(xpath string) error {
 	_, err := v.conn.Write(newXMLTEXTCommand(xpath))
 	if err != nil {
 		return err
@@ -184,7 +292,7 @@ func (v *Vmix) XMLPATH(xpath string) error {
 }
 
 // TALLY Get tally status
-func (v *Vmix) TALLY() error {
+func (v *Vmix) Tally() error {
 	_, err := v.conn.Write(newTALLYCommand())
 	if err != nil {
 		return err
@@ -193,7 +301,7 @@ func (v *Vmix) TALLY() error {
 }
 
 // FUNCTION Send function
-func (v *Vmix) FUNCTION(funcname string) error {
+func (v *Vmix) Function(funcname string) error {
 	_, err := v.conn.Write(newFUNCTIONCommand(funcname))
 	if err != nil {
 		return err
@@ -202,8 +310,8 @@ func (v *Vmix) FUNCTION(funcname string) error {
 }
 
 // SUBSCRIBE Event
-func (v *Vmix) SUBSCRIBE(event, option string) error {
-	_, err := v.Write(newSUBSCRIBECommand(event, option))
+func (v *Vmix) Subscribe(event, option string) error {
+	_, err := v.conn.Write(newSUBSCRIBECommand(event, option))
 	if err != nil {
 		return err
 	}
@@ -211,8 +319,8 @@ func (v *Vmix) SUBSCRIBE(event, option string) error {
 }
 
 // UNSUBSCRIBE from event.
-func (v *Vmix) UNSUBSCRIBE(event string) error {
-	_, err := v.Write(newUNSUBSCRIBECommand(event))
+func (v *Vmix) Unsubscribe(event string) error {
+	_, err := v.conn.Write(newUNSUBSCRIBECommand(event))
 	if err != nil {
 		return err
 	}
@@ -220,7 +328,7 @@ func (v *Vmix) UNSUBSCRIBE(event string) error {
 }
 
 // QUIT Sends QUIT sigal
-func (v *Vmix) QUIT() error {
+func (v *Vmix) Quit() error {
 	_, err := v.conn.Write(newQUITCommand())
 	if err != nil {
 		return err

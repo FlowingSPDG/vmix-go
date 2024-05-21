@@ -3,12 +3,17 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"os/signal"
 	"time"
 
 	vmixtcp "github.com/FlowingSPDG/vmix-go/tcp"
 )
 
 func main() {
+	ctx := context.Background()
+	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
+
 	var v *vmixtcp.Vmix
 	retry := func() error {
 		// reconnect
@@ -17,19 +22,18 @@ func main() {
 		if err != nil {
 			return err
 		}
+		// register callback
+		v.OnTally(func(r *vmixtcp.TallyResponse) {
+			log.Println("TALLY:", r.Tally)
+		})
 
 		// re-subscribe
-		if err := v.SUBSCRIBE(vmixtcp.EVENT_TALLY, ""); err != nil {
+		if err := v.Subscribe(vmixtcp.EventTally, ""); err != nil {
 			return err
 		}
-		v.Register(vmixtcp.EVENT_TALLY, func(r *vmixtcp.Response) {
-			log.Println("TALLY:", r)
-		})
-		// timeout
-		time.Sleep(time.Second)
 
 		// run
-		return v.Run(context.TODO())
+		return v.Run(ctx)
 	}
 	go func() {
 		for err := retry(); err != nil; {
@@ -38,6 +42,7 @@ func main() {
 			err = retry()
 		}
 	}()
-	lock := make(chan struct{})
-	<-lock
+	<-ctx.Done()
+	cancel()
+	log.Println("Shutting down")
 }

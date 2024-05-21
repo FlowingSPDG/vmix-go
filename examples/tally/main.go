@@ -16,6 +16,12 @@ func main() {
 
 	v := vmixtcp.New("localhost")
 	// register callback
+	v.OnVersion(func(r *vmixtcp.VersionResponse) {
+		// re-subscribe
+		if err := v.Subscribe(vmixtcp.EventTally, ""); err != nil {
+			panic(err)
+		}
+	})
 	v.OnTally(func(r *vmixtcp.TallyResponse) {
 		log.Println("TALLY:", r.Tally)
 	})
@@ -23,11 +29,6 @@ func main() {
 	retry := func() error {
 		// reconnect
 		if err := v.Connect(); err != nil {
-			return err
-		}
-
-		// re-subscribe
-		if err := v.Subscribe(vmixtcp.EventTally, ""); err != nil {
 			return err
 		}
 

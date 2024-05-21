@@ -19,6 +19,20 @@ func main() {
 	// register callback
 	v.OnVersion(func(r *vmixtcp.VersionResponse) {
 		log.Println("Version:", r.Version)
+
+		// subscribe
+		if err := v.Subscribe(vmixtcp.EventActs, ""); err != nil {
+			panic(err)
+		}
+
+		// Send commands
+		if err := v.XML(); err != nil {
+			panic(err)
+		}
+
+		if err := v.Acts("InputPreview"); err != nil {
+			panic(err)
+		}
 	})
 	v.OnActs(func(r *vmixtcp.ActsResponse) {
 		log.Println("Response:", r.Response)
@@ -30,20 +44,6 @@ func main() {
 	retry := func() error {
 		// Connect TCP API
 		if err := v.Connect(); err != nil {
-			return err
-		}
-
-		// subscribe
-		if err := v.Subscribe(vmixtcp.EventActs, ""); err != nil {
-			return err
-		}
-
-		// Send commands
-		if err := v.XML(); err != nil {
-			return err
-		}
-
-		if err := v.Acts("InputPreview"); err != nil {
 			return err
 		}
 

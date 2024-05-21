@@ -44,10 +44,12 @@ type VersionResponse struct {
 }
 
 type FunctionResponse struct {
+	// Status   string // "OK" or "ER"
 	Response string
 }
 
 type ActsResponse struct {
+	// Status string // "OK" or "ER"
 	// e.g. Following examples are for "InputPreview" command.
 	//
 	// "InputPreview 1 1"

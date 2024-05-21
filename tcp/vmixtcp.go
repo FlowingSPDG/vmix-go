@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/FlowingSPDG/vmix-go/common/models"
 )
@@ -39,6 +40,11 @@ type vmix struct {
 	callbacks callbacks
 }
 
+// Vmix
+// vMix TCP API Main interface.
+// You always need to call Connect() before Run().
+// You can call other methods before Run() since connection buffer holds the response from vMix but method needs be called after initiating TCP connection.
+// So I highly recommend you to send commands inside of OnVersion callback since Version command is the first command that vMix sends after connection establish.
 type Vmix interface {
 	IsConnected() bool
 
@@ -109,7 +115,10 @@ func (v *vmix) Connect() error {
 	}
 	// Start connecting to vmix TCP API
 	host := net.JoinHostPort(v.dest, "8099")
-	conn, err := net.Dial("tcp", host)
+	d := net.Dialer{
+		Timeout: 5 * time.Second,
+	}
+	conn, err := d.Dial("tcp", host)
 	if err != nil {
 		return ErrFailedToInitiateConnection
 	}

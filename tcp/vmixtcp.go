@@ -17,6 +17,7 @@ import (
 )
 
 var (
+	ErrAlreadyConnected           = errors.New("already connected")
 	ErrDisconnected               = errors.New("disconnected")
 	ErrFailedToInitiateConnection = errors.New("failed to initiate connection")
 	ErrNotConnected               = errors.New("not connected to vMix")
@@ -111,7 +112,7 @@ func (v *vmix) IsConnected() bool {
 
 func (v *vmix) Connect() error {
 	if v.connected {
-		panic("Already connected")
+		return ErrAlreadyConnected
 	}
 	// Start connecting to vmix TCP API
 	host := net.JoinHostPort(v.dest, "8099")
@@ -437,14 +438,15 @@ func (v *vmix) Close() error {
 		return err
 	}
 	v.connected = false
-	v.conn = nil
+	// ?
+	// v.conn = nil
+	// v.reader = nil
 	return nil
 }
 
 // TALLY Get tally status
 func (v *vmix) Tally() error {
-	_, err := v.conn.Write(newTallyCommand())
-	if err != nil {
+	if err := v.send(newTallyCommand()); err != nil {
 		return err
 	}
 	return nil

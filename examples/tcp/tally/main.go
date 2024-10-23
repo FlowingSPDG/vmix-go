@@ -11,9 +11,8 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
-
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	
 	v := vmixtcp.New("localhost")
 	// register callback
 	v.OnVersion(func(r *vmixtcp.VersionResponse) {

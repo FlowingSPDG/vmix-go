@@ -11,8 +11,7 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 
 	// Initialize vMix
 	v := vmixtcp.New("localhost")

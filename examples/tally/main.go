@@ -28,13 +28,14 @@ func main() {
 
 	retry := func() error {
 		// reconnect
-		if err := v.Connect(); err != nil {
+		if err := v.Connect(time.Second); err != nil {
 			return err
 		}
 
 		// run
 		return v.Run(ctx)
 	}
+
 	go func() {
 		for {
 			if err := retry(); err != nil {

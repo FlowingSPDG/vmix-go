@@ -42,7 +42,7 @@ func main() {
 
 	retry := func() error {
 		// Connect TCP API
-		if err := v.Connect(time.Second); err != nil {
+		if err := v.Connect(ctx, time.Second); err != nil {
 			return err
 		}
 

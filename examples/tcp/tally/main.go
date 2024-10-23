@@ -12,7 +12,7 @@ import (
 
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	
+
 	v := vmixtcp.New("localhost")
 	// register callback
 	v.OnVersion(func(r *vmixtcp.VersionResponse) {
@@ -27,7 +27,7 @@ func main() {
 
 	retry := func() error {
 		// reconnect
-		if err := v.Connect(time.Second); err != nil {
+		if err := v.Connect(ctx, time.Second); err != nil {
 			return err
 		}
 

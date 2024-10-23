@@ -50,9 +50,9 @@ type vmix struct {
 type Vmix interface {
 	IsConnected() bool
 
-	Connect(timeout time.Duration) error // Connects vMix TCP API. You need to call this before Run().
-	Run(ctx context.Context) error       // Start Receiving TCP packet with vMix. You need to call this after Connect(). You can call other methods before Run() since connection buffer holds the response from vMix.
-	Close() error                        // Close connection. Wraps Quit() and conn.Close().
+	Connect(ctx context.Context, timeout time.Duration) error // Connects vMix TCP API. You need to call this before Run().
+	Run(ctx context.Context) error                            // Start Receiving TCP packet with vMix. You need to call this after Connect(). You can call other methods before Run() since connection buffer holds the response from vMix.
+	Close() error                                             // Close connection. Wraps Quit() and conn.Close().
 
 	// Send commands
 	Tally() error
@@ -111,7 +111,7 @@ func (v *vmix) IsConnected() bool {
 	return v.connected
 }
 
-func (v *vmix) Connect(timeout time.Duration) error {
+func (v *vmix) Connect(ctx context.Context, timeout time.Duration) error {
 	if v.connected {
 		return ErrAlreadyConnected
 	}
@@ -120,7 +120,7 @@ func (v *vmix) Connect(timeout time.Duration) error {
 	d := net.Dialer{
 		Timeout: timeout,
 	}
-	conn, err := d.Dial("tcp", host)
+	conn, err := d.DialContext(ctx, "tcp", host)
 	if err != nil {
 		return ErrFailedToInitiateConnection
 	}

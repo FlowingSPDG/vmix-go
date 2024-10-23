@@ -11,8 +11,7 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 
 	v := vmixtcp.New("localhost")
 	// register callback
@@ -28,13 +27,14 @@ func main() {
 
 	retry := func() error {
 		// reconnect
-		if err := v.Connect(); err != nil {
+		if err := v.Connect(ctx, time.Second); err != nil {
 			return err
 		}
 
 		// run
 		return v.Run(ctx)
 	}
+
 	go func() {
 		for {
 			if err := retry(); err != nil {

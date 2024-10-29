@@ -21,6 +21,7 @@ var (
 	ErrAlreadyConnected           = errors.New("already connected")
 	ErrDisconnected               = errors.New("disconnected")
 	ErrFailedToInitiateConnection = errors.New("failed to initiate connection")
+	ErrFailedToDisconnect         = errors.New("failed to disconnect")
 	ErrNotConnected               = errors.New("not connected to vMix")
 	ErrFailedToReadCommand        = errors.New("failed to read command")
 	ErrFailedToReadStatus         = errors.New("failed to read status")
@@ -218,7 +219,7 @@ func (v *vmix) Run(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			if err := v.Close(); err != nil {
-				log.Println("Failed to close connection:", err)
+				return xerrors.Errorf("failed to close connection : %w", errors.Join(ErrFailedToDisconnect, err))
 			}
 		default:
 			command, err := v.readCommand(ctx)

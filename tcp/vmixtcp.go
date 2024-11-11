@@ -66,25 +66,25 @@ type Vmix interface {
 	Quit() error // Normally you do not need to call this. Instead, call Close() for connection closure.
 
 	// Callbacks. Since vMix TCP API does not respond to the command, you need to register callbacks to receive responses.
-	OnVersion(func(*VersionResponse))
-	OnTally(func(*TallyResponse))
-	OnFunction(func(*FunctionResponse))
-	OnActs(func(*ActsResponse))
-	OnXML(func(*XMLResponse))
-	OnXMLText(func(*XMLTextResponse))
-	OnSubscribe(func(*SubscribeResponse))
-	OnUnsubscribe(func(*UnsubscribeResponse))
+	OnVersion(func(*VersionResponse, error))
+	OnTally(func(*TallyResponse, error))
+	OnFunction(func(*FunctionResponse, error))
+	OnActs(func(*ActsResponse, error))
+	OnXML(func(*XMLResponse, error))
+	OnXMLText(func(*XMLTextResponse, error))
+	OnSubscribe(func(*SubscribeResponse, error))
+	OnUnsubscribe(func(*UnsubscribeResponse, error))
 }
 
 type callbacks struct {
-	version     func(*VersionResponse)
-	tally       func(*TallyResponse)
-	function    func(*FunctionResponse)
-	acts        func(*ActsResponse)
-	xml         func(*XMLResponse)
-	xmltext     func(*XMLTextResponse)
-	subscribe   func(*SubscribeResponse)
-	unsubscribe func(*UnsubscribeResponse)
+	version     func(*VersionResponse, error)
+	tally       func(*TallyResponse, error)
+	function    func(*FunctionResponse, error)
+	acts        func(*ActsResponse, error)
+	xml         func(*XMLResponse, error)
+	xmltext     func(*XMLTextResponse, error)
+	subscribe   func(*SubscribeResponse, error)
+	unsubscribe func(*UnsubscribeResponse, error)
 }
 
 // New vmix instance.
@@ -96,14 +96,14 @@ func New(dest string) Vmix {
 		conn:      nil,
 		reader:    nil,
 		callbacks: callbacks{
-			version:     func(*VersionResponse) {},
-			tally:       func(*TallyResponse) {},
-			function:    func(*FunctionResponse) {},
-			acts:        func(*ActsResponse) {},
-			xml:         func(*XMLResponse) {},
-			xmltext:     func(*XMLTextResponse) {},
-			subscribe:   func(*SubscribeResponse) {},
-			unsubscribe: func(*UnsubscribeResponse) {},
+			version:     func(*VersionResponse, error) {},
+			tally:       func(*TallyResponse, error) {},
+			function:    func(*FunctionResponse, error) {},
+			acts:        func(*ActsResponse, error) {},
+			xml:         func(*XMLResponse, error) {},
+			xmltext:     func(*XMLTextResponse, error) {},
+			subscribe:   func(*SubscribeResponse, error) {},
+			unsubscribe: func(*UnsubscribeResponse, error) {},
 		},
 	}
 }
@@ -204,7 +204,7 @@ func (v *vmix) readXML(length int) (*models.APIXML, error) {
 	}
 	api := models.APIXML{}
 	if err := xml.Unmarshal(b, &api); err != nil {
-		return nil, ErrFailedToUnmarshal
+		return nil, errors.Join(xerrors.Errorf("failed to unmarshal XML : %w", err), ErrFailedToUnmarshal)
 	}
 	return &api, nil
 }
@@ -230,7 +230,6 @@ func (v *vmix) Run(ctx context.Context) error {
 					}
 					return ErrDisconnected
 				}
-				log.Println("Failed to read command:", err)
 				continue
 			}
 
@@ -241,8 +240,6 @@ func (v *vmix) Run(ctx context.Context) error {
 						v.Close()
 						return err
 					}
-					log.Println("Failed to read status:", err)
-					continue
 				}
 				version, err := v.readLine()
 				if err != nil {
@@ -250,13 +247,11 @@ func (v *vmix) Run(ctx context.Context) error {
 						v.Close()
 						return err
 					}
-					log.Println("Failed to read response:", err)
-					continue
 				}
 				resp := VersionResponse{
 					Version: string(version),
 				}
-				v.callbacks.version(&resp)
+				v.callbacks.version(&resp, err)
 
 			case commandTally:
 				if err := v.readStatus(); err != nil {
@@ -264,8 +259,6 @@ func (v *vmix) Run(ctx context.Context) error {
 						v.Close()
 						return err
 					}
-					log.Println("Failed to read status:", err)
-					continue
 				}
 				tallies, err := v.readLine()
 				if err != nil {
@@ -273,13 +266,11 @@ func (v *vmix) Run(ctx context.Context) error {
 						v.Close()
 						return err
 					}
-					log.Println("Failed to read tallies:", err)
-					continue
 				}
 				resp := TallyResponse{
 					Tally: encodeTallies([]byte(tallies)),
 				}
-				v.callbacks.tally(&resp)
+				v.callbacks.tally(&resp, err)
 
 			case commandFunction:
 				if err := v.readStatus(); err != nil {
@@ -287,8 +278,6 @@ func (v *vmix) Run(ctx context.Context) error {
 						v.Close()
 						return err
 					}
-					log.Println("Failed to read status:", err)
-					continue
 				}
 				response, err := v.readLine()
 				if err != nil {
@@ -296,13 +285,11 @@ func (v *vmix) Run(ctx context.Context) error {
 						v.Close()
 						return err
 					}
-					log.Println("Failed to read response:", err)
-					continue
 				}
 				resp := FunctionResponse{
 					Response: string(response),
 				}
-				v.callbacks.function(&resp)
+				v.callbacks.function(&resp, err)
 
 			case commandActs:
 				if err := v.readStatus(); err != nil {
@@ -310,8 +297,6 @@ func (v *vmix) Run(ctx context.Context) error {
 						v.Close()
 						return err
 					}
-					log.Println("Failed to read status:", err)
-					continue
 				}
 				response, err := v.readLine()
 				if err != nil {
@@ -319,13 +304,11 @@ func (v *vmix) Run(ctx context.Context) error {
 						v.Close()
 						return err
 					}
-					log.Println("Failed to read response:", err)
-					continue
 				}
 				resp := ActsResponse{
 					Response: string(response),
 				}
-				v.callbacks.acts(&resp)
+				v.callbacks.acts(&resp, err)
 
 			case commandXML:
 				length, err := v.readLength()
@@ -343,14 +326,12 @@ func (v *vmix) Run(ctx context.Context) error {
 						v.Close()
 						return err
 					}
-					log.Println("Failed to read XML:", err)
-					continue
 				}
 
 				resp := XMLResponse{
 					XML: api,
 				}
-				v.callbacks.xml(&resp)
+				v.callbacks.xml(&resp, err)
 
 			case commandXMLText:
 				if err := v.readStatus(); err != nil {
@@ -373,7 +354,7 @@ func (v *vmix) Run(ctx context.Context) error {
 				resp := XMLTextResponse{
 					XMLText: string(xmltext),
 				}
-				v.callbacks.xmltext(&resp)
+				v.callbacks.xmltext(&resp, err)
 
 			case commandSubscribe:
 				if err := v.readStatus(); err != nil {
@@ -396,7 +377,7 @@ func (v *vmix) Run(ctx context.Context) error {
 				resp := SubscribeResponse{
 					Command: string(respCommand),
 				}
-				v.callbacks.subscribe(&resp)
+				v.callbacks.subscribe(&resp, err)
 
 			case commandUnsubscribe:
 				if err := v.readStatus(); err != nil {
@@ -419,7 +400,7 @@ func (v *vmix) Run(ctx context.Context) error {
 				resp := UnsubscribeResponse{
 					Command: string(respCommand),
 				}
-				v.callbacks.unsubscribe(&resp)
+				v.callbacks.unsubscribe(&resp, err)
 
 			}
 		}

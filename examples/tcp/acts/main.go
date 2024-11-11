@@ -16,7 +16,10 @@ func main() {
 	// Initialize vMix
 	v := vmixtcp.New("localhost")
 	// register callback
-	v.OnVersion(func(r *vmixtcp.VersionResponse) {
+	v.OnVersion(func(r *vmixtcp.VersionResponse, err error) {
+		if err != nil {
+			log.Println("Error:", err)
+		}
 		log.Println("Version:", r.Version)
 
 		// subscribe
@@ -33,10 +36,18 @@ func main() {
 			panic(err)
 		}
 	})
-	v.OnActs(func(r *vmixtcp.ActsResponse) {
+
+	v.OnActs(func(r *vmixtcp.ActsResponse, err error) {
+		if err != nil {
+			log.Println("Error:", err)
+		}
 		log.Println("Response:", r.Response)
 	})
-	v.OnXML(func(r *vmixtcp.XMLResponse) {
+
+	v.OnXML(func(r *vmixtcp.XMLResponse, err error) {
+		if err != nil {
+			log.Println("Error:", err)
+		}
 		log.Printf("XML: %#v\n", r.XML)
 	})
 
@@ -58,7 +69,8 @@ func main() {
 			}
 		}
 	}()
+
 	<-ctx.Done()
 	cancel()
-	log.Println("Shutting down")
+	log.Println("Shutting down...")
 }

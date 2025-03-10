@@ -64,6 +64,7 @@ type Vmix interface {
 	Subscribe(event, command string) error
 	Unsubscribe(command string) error
 	Quit() error // Normally you do not need to call this. Instead, call Close() for connection closure.
+	Version() error
 
 	// Callbacks. Since vMix TCP API does not respond to the command, you need to register callbacks to receive responses.
 	OnVersion(func(*VersionResponse, error))

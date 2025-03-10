@@ -420,11 +420,8 @@ func (v *vmix) send(command []byte) error {
 	return nil
 }
 
-// Close connection. Calls QUIT command before connection closure.
+// Close connection
 func (v *vmix) Close() error {
-	if err := v.Quit(); err != nil {
-		return err
-	}
 	if err := v.conn.Close(); err != nil {
 		return err
 	}

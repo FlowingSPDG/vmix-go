@@ -4,7 +4,7 @@ import (
 	"strconv"
 )
 
-func (v *Client) sendTransition(transition string, input interface{}, duration uint) error {
+func (v *Client) sendTransition(transition string, input any, duration uint) error {
 	params := make(map[string]string)
 	if input != nil {
 		in, err := resolveInput(input)

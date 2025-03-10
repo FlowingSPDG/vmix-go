@@ -65,3 +65,7 @@ func newUnsubscribeCommand(event string) []byte {
 func newQuitCommand() []byte {
 	return []byte(commandQuit + terminate)
 }
+
+func newVersionCommand() []byte {
+	return []byte(commandVersion + terminate)
+}

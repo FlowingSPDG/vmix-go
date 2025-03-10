@@ -15,13 +15,21 @@ func main() {
 
 	v := vmixtcp.New("localhost")
 	// register callback
-	v.OnVersion(func(r *vmixtcp.VersionResponse) {
+	v.OnVersion(func(r *vmixtcp.VersionResponse, err error) {
+		if err != nil {
+			log.Println("VERSION ERROR:", err)
+			return
+		}
 		// re-subscribe
 		if err := v.Subscribe(vmixtcp.EventTally, ""); err != nil {
 			panic(err)
 		}
 	})
-	v.OnTally(func(r *vmixtcp.TallyResponse) {
+	v.OnTally(func(r *vmixtcp.TallyResponse, err error) {
+		if err != nil {
+			log.Println("VERSION ERROR:", err)
+			return
+		}
 		log.Println("TALLY:", r.Tally)
 	})
 

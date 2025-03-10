@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/FlowingSPDG/vmix-go/common/models"
+	models "github.com/FlowingSPDG/vmix-go"
 )
 
 // Client vMix HTTP API main object

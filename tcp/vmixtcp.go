@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/FlowingSPDG/vmix-go/common/models"
+	vmixgo "github.com/FlowingSPDG/vmix-go"
 	"golang.org/x/xerrors"
 )
 
@@ -194,7 +194,7 @@ func (v *vmix) readLength() (int, error) {
 	return i, nil
 }
 
-func (v *vmix) readXML(length int) (*models.APIXML, error) {
+func (v *vmix) readXML(length int) (*vmixgo.APIXML, error) {
 	b := make([]byte, length)
 	if _, err := io.ReadFull(v.reader, b); err != nil {
 		if err == io.EOF {
@@ -202,7 +202,7 @@ func (v *vmix) readXML(length int) (*models.APIXML, error) {
 		}
 		return nil, ErrFailedToReadXML
 	}
-	api := models.APIXML{}
+	api := vmixgo.APIXML{}
 	if err := xml.Unmarshal(b, &api); err != nil {
 		return nil, errors.Join(xerrors.Errorf("failed to unmarshal XML : %w", err), ErrFailedToUnmarshal)
 	}
@@ -493,6 +493,13 @@ func (v *vmix) Unsubscribe(command string) error {
 // QUIT Sends QUIT sigal
 func (v *vmix) Quit() error {
 	if err := v.send(newQuitCommand()); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (v *vmix) Version() error {
+	if err := v.send(newVersionCommand()); err != nil {
 		return err
 	}
 	return nil

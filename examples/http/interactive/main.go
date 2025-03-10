@@ -6,12 +6,12 @@ import (
 
 	"github.com/c-bata/go-prompt"
 
-	"github.com/FlowingSPDG/vmix-go/common/models"
+	vmixgo "github.com/FlowingSPDG/vmix-go"
 	vmixhttp "github.com/FlowingSPDG/vmix-go/http"
 )
 
 var (
-	Inputs []models.Input
+	Inputs []vmixgo.Input
 	host   *string
 	port   *int
 )

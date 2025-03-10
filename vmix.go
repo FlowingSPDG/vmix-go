@@ -7,6 +7,10 @@ import (
 	"golang.org/x/xerrors"
 )
 
+type VMix interface {
+	// TODO: implement for Both TCP and HTTP API
+}
+
 type VmixBool bool
 
 func (b *VmixBool) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {

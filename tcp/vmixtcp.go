@@ -58,7 +58,7 @@ type Vmix interface {
 	// Send commands
 	Tally() error
 	Function(name string, query string) error
-	Acts(name string, input ...int) error
+	Acts(name string, input *int) error
 	XML() error
 	XMLText(xpath string) error
 	Subscribe(event, command string) error
@@ -449,8 +449,8 @@ func (v *vmix) Function(name string, query string) error {
 }
 
 // Acts Send ACTS command
-func (v *vmix) Acts(name string, input ...int) error {
-	if err := v.send(newActsCommand(name, input...)); err != nil {
+func (v *vmix) Acts(name string, input *int) error {
+	if err := v.send(newActsCommand(name, input)); err != nil {
 		return err
 	}
 	return nil

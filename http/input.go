@@ -144,8 +144,8 @@ func (v *Client) SetInputName(input interface{}, name string) error {
 // AddInput Add a new input
 func (v *Client) AddInput(inputType, value string) error {
 	params := make(map[string]string)
-	params["Value"] = value
-	return v.SendFunction("AddInput"+inputType, params)
+	params["Value"] = fmt.Sprintf("%s|%s", inputType, value)
+	return v.SendFunction("AddInput", params)
 }
 
 // SetCrop Set input crop (Left,Top,Right,Bottom) in pixels

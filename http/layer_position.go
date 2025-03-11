@@ -335,7 +335,7 @@ func (v *Client) SetLayer10Y(input interface{}, y int) error {
 }
 
 // Layer1-10のRectangle実装
-func (v *Client) SetLayerRectangle(input any, layer uint8, x, y, width, height uint) error {
+func (v *Client) SetLayerRectangle(input any, layer uint8, x, y, width, height float64) error {
 	switch layer {
 	case 1:
 		return v.SetLayer1Rectangle(input, x, y, width, height)
@@ -361,52 +361,52 @@ func (v *Client) SetLayerRectangle(input any, layer uint8, x, y, width, height u
 	return xerrors.Errorf("invalid layer: %d", layer)
 }
 
-func (v *Client) SetLayer1Rectangle(input interface{}, x, y, width, height uint) error {
-	value := fmt.Sprintf("%d,%d,%d,%d", x, y, width, height)
+func (v *Client) SetLayer1Rectangle(input interface{}, x, y, width, height float64) error {
+	value := fmt.Sprintf("%.6f,%.6f,%.6f,%.6f", x, y, width, height)
 	return v.setLayerParam("SetLayer1Rectangle", input, &value)
 }
 
-func (v *Client) SetLayer2Rectangle(input interface{}, x, y, width, height uint) error {
-	value := fmt.Sprintf("%d,%d,%d,%d", x, y, width, height)
+func (v *Client) SetLayer2Rectangle(input interface{}, x, y, width, height float64) error {
+	value := fmt.Sprintf("%.6f,%.6f,%.6f,%.6f", x, y, width, height)
 	return v.setLayerParam("SetLayer2Rectangle", input, &value)
 }
 
-func (v *Client) SetLayer3Rectangle(input interface{}, x, y, width, height uint) error {
-	value := fmt.Sprintf("%d,%d,%d,%d", x, y, width, height)
+func (v *Client) SetLayer3Rectangle(input interface{}, x, y, width, height float64) error {
+	value := fmt.Sprintf("%.6f,%.6f,%.6f,%.6f", x, y, width, height)
 	return v.setLayerParam("SetLayer3Rectangle", input, &value)
 }
 
-func (v *Client) SetLayer4Rectangle(input interface{}, x, y, width, height uint) error {
-	value := fmt.Sprintf("%d,%d,%d,%d", x, y, width, height)
+func (v *Client) SetLayer4Rectangle(input interface{}, x, y, width, height float64) error {
+	value := fmt.Sprintf("%.6f,%.6f,%.6f,%.6f", x, y, width, height)
 	return v.setLayerParam("SetLayer4Rectangle", input, &value)
 }
 
-func (v *Client) SetLayer5Rectangle(input interface{}, x, y, width, height uint) error {
-	value := fmt.Sprintf("%d,%d,%d,%d", x, y, width, height)
+func (v *Client) SetLayer5Rectangle(input interface{}, x, y, width, height float64) error {
+	value := fmt.Sprintf("%.6f,%.6f,%.6f,%.6f", x, y, width, height)
 	return v.setLayerParam("SetLayer5Rectangle", input, &value)
 }
 
-func (v *Client) SetLayer6Rectangle(input interface{}, x, y, width, height uint) error {
-	value := fmt.Sprintf("%d,%d,%d,%d", x, y, width, height)
+func (v *Client) SetLayer6Rectangle(input interface{}, x, y, width, height float64) error {
+	value := fmt.Sprintf("%.6f,%.6f,%.6f,%.6f", x, y, width, height)
 	return v.setLayerParam("SetLayer6Rectangle", input, &value)
 }
 
-func (v *Client) SetLayer7Rectangle(input interface{}, x, y, width, height uint) error {
-	value := fmt.Sprintf("%d,%d,%d,%d", x, y, width, height)
+func (v *Client) SetLayer7Rectangle(input interface{}, x, y, width, height float64) error {
+	value := fmt.Sprintf("%.6f,%.6f,%.6f,%.6f", x, y, width, height)
 	return v.setLayerParam("SetLayer7Rectangle", input, &value)
 }
 
-func (v *Client) SetLayer8Rectangle(input interface{}, x, y, width, height uint) error {
-	value := fmt.Sprintf("%d,%d,%d,%d", x, y, width, height)
+func (v *Client) SetLayer8Rectangle(input interface{}, x, y, width, height float64) error {
+	value := fmt.Sprintf("%.6f,%.6f,%.6f,%.6f", x, y, width, height)
 	return v.setLayerParam("SetLayer8Rectangle", input, &value)
 }
 
-func (v *Client) SetLayer9Rectangle(input interface{}, x, y, width, height uint) error {
-	value := fmt.Sprintf("%d,%d,%d,%d", x, y, width, height)
+func (v *Client) SetLayer9Rectangle(input interface{}, x, y, width, height float64) error {
+	value := fmt.Sprintf("%.6f,%.6f,%.6f,%.6f", x, y, width, height)
 	return v.setLayerParam("SetLayer9Rectangle", input, &value)
 }
 
-func (v *Client) SetLayer10Rectangle(input interface{}, x, y, width, height uint) error {
-	value := fmt.Sprintf("%d,%d,%d,%d", x, y, width, height)
+func (v *Client) SetLayer10Rectangle(input interface{}, x, y, width, height float64) error {
+	value := fmt.Sprintf("%.6f,%.6f,%.6f,%.6f", x, y, width, height)
 	return v.setLayerParam("SetLayer10Rectangle", input, &value)
 }

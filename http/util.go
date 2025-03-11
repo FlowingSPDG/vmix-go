@@ -20,3 +20,8 @@ func resolveInput(input any) (string, error) {
 		return "", fmt.Errorf("Interface type not correct(%v)", input)
 	}
 }
+
+// itoa converts an integer to a string
+func itoa(i uint) string {
+	return strconv.Itoa(int(i))
+}

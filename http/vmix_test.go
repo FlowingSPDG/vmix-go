@@ -17,7 +17,7 @@ func TestRefresh(t *testing.T) {
 	}
 }
 
-//browser.go
+// browser.go
 func TestBrowserBack(t *testing.T) {
 	vmix, err := NewClient("localhost", 8088)
 	if err != nil {
@@ -1054,6 +1054,341 @@ func TestTransition4(t *testing.T) {
 		t.Fatal(err)
 	}
 	err = vmix.Transition4()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// title.go
+func TestSetTitle(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetTitle(0, "Test Title")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetText(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetText(0, "TextBlock1", "Test Text")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTitleBeginAnimation(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.TitleBeginAnimation(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTitlePreset(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.TitlePreset(0, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTitlePresetNext(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.TitlePresetNext(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTitlePresetPrevious(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.TitlePresetPrevious(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// ptz.go
+func TestPTZUpdatePreset(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.PTZUpdatePreset(0, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPTZRecall(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.PTZRecall(0, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPTZFocusAutoToggle(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.PTZFocusAutoToggle(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPTZFocusManual(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.PTZFocusManual(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPTZFocusAuto(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.PTZFocusAuto(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPTZHome(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.PTZHome(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPTZZoomIn(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.PTZZoomIn(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPTZZoomOut(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.PTZZoomOut(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestPTZPanTilt(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.PTZPanTilt(0, 0.5, -0.5)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// audio.go
+func TestAudioAutoMute(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.AudioAutoMute(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAudioAutoUnMute(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.AudioAutoUnMute(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAudioBus(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.AudioBus(0, "Master")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAudioBusOff(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.AudioBusOff(0, "Master")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAudioBusOn(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.AudioBusOn(0, "Master")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAudioMixerShowHide(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.AudioMixerShowHide()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAudioMixerShow(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.AudioMixerShow()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAudioMixerHide(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.AudioMixerHide()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// input.go
+func TestSetInputName(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetInputName(1, "New Input Name")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestResetInput(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.ResetInput(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStartStopPlayList(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.StartStopPlayList()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+// dynamic.go
+func TestSetDynamicValue1(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetDynamicValue1("test value 1")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetDynamicValue2(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetDynamicValue2("test value 2")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetDynamicValue3(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetDynamicValue3("test value 3")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSetDynamicValue4(t *testing.T) {
+	vmix, err := NewClient("localhost", 8088)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vmix.SetDynamicValue4("test value 4")
 	if err != nil {
 		t.Fatal(err)
 	}

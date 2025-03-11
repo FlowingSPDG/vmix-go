@@ -23,3 +23,8 @@ func (v *Client) SendKeys(keys string) error {
 	params["Value"] = keys
 	return v.SendFunction("SendKeys", params)
 }
+
+// StartStopPlayList Start or stop the current playlist
+func (v *Client) StartStopPlayList() error {
+	return v.SendFunction("StartStopPlayList", nil)
+}

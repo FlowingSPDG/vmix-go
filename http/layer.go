@@ -85,53 +85,53 @@ func (v *Client) LayerOn(input interface{}, layer uint) error {
 }
 
 // Layer1-10のCrop実装
-func (v *Client) SetLayer1Crop(input interface{}, left, top, right, bottom float64) error {
-	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(left), validateCrop(top), validateCrop(right), validateCrop(bottom))
+func (v *Client) SetLayer1Crop(input interface{}, x1, y1, x2, y2 float64) error {
+	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer1Crop", input, &value)
 }
 
-func (v *Client) SetLayer2Crop(input interface{}, left, top, right, bottom float64) error {
-	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(left), validateCrop(top), validateCrop(right), validateCrop(bottom))
+func (v *Client) SetLayer2Crop(input interface{}, x1, y1, x2, y2 float64) error {
+	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer2Crop", input, &value)
 }
 
-func (v *Client) SetLayer3Crop(input interface{}, left, top, right, bottom float64) error {
-	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(left), validateCrop(top), validateCrop(right), validateCrop(bottom))
+func (v *Client) SetLayer3Crop(input interface{}, x1, y1, x2, y2 float64) error {
+	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer3Crop", input, &value)
 }
 
-func (v *Client) SetLayer4Crop(input interface{}, left, top, right, bottom float64) error {
-	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(left), validateCrop(top), validateCrop(right), validateCrop(bottom))
+func (v *Client) SetLayer4Crop(input interface{}, x1, y1, x2, y2 float64) error {
+	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer4Crop", input, &value)
 }
 
-func (v *Client) SetLayer5Crop(input interface{}, left, top, right, bottom float64) error {
-	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(left), validateCrop(top), validateCrop(right), validateCrop(bottom))
+func (v *Client) SetLayer5Crop(input interface{}, x1, y1, x2, y2 float64) error {
+	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer5Crop", input, &value)
 }
 
-func (v *Client) SetLayer6Crop(input interface{}, left, top, right, bottom float64) error {
-	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(left), validateCrop(top), validateCrop(right), validateCrop(bottom))
+func (v *Client) SetLayer6Crop(input interface{}, x1, y1, x2, y2 float64) error {
+	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer6Crop", input, &value)
 }
 
-func (v *Client) SetLayer7Crop(input interface{}, left, top, right, bottom float64) error {
-	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(left), validateCrop(top), validateCrop(right), validateCrop(bottom))
+func (v *Client) SetLayer7Crop(input interface{}, x1, y1, x2, y2 float64) error {
+	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer7Crop", input, &value)
 }
 
-func (v *Client) SetLayer8Crop(input interface{}, left, top, right, bottom float64) error {
-	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(left), validateCrop(top), validateCrop(right), validateCrop(bottom))
+func (v *Client) SetLayer8Crop(input interface{}, x1, y1, x2, y2 float64) error {
+	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer8Crop", input, &value)
 }
 
-func (v *Client) SetLayer9Crop(input interface{}, left, top, right, bottom float64) error {
-	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(left), validateCrop(top), validateCrop(right), validateCrop(bottom))
+func (v *Client) SetLayer9Crop(input interface{}, x1, y1, x2, y2 float64) error {
+	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer9Crop", input, &value)
 }
 
-func (v *Client) SetLayer10Crop(input interface{}, left, top, right, bottom float64) error {
-	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(left), validateCrop(top), validateCrop(right), validateCrop(bottom))
+func (v *Client) SetLayer10Crop(input interface{}, x1, y1, x2, y2 float64) error {
+	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer10Crop", input, &value)
 }
 

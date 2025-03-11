@@ -1,6 +1,9 @@
 package vmixhttp
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 // SelectInput Select Input by Number or Name
 func (v *Client) SelectInput(input interface{}) error {
@@ -207,17 +210,14 @@ func (v *Client) SetColorCorrectionPreset(input interface{}, preset uint8) error
 }
 
 // SetInputLayer Set input layer (0-10)
-func (v *Client) SetInputLayer(input interface{}, layer uint8) error {
-	if layer > 10 {
-		layer = 10
-	}
+func (v *Client) SetInputLayer(input interface{}, index, layer uint8) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err
 	}
 	params := make(map[string]string)
 	params["Input"] = in
-	params["Value"] = strconv.Itoa(int(layer))
+	params["Value"] = fmt.Sprintf("%d%d", index, layer)
 	return v.SendFunction("SetLayer", params)
 }
 

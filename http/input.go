@@ -209,8 +209,8 @@ func (v *Client) SetColorCorrectionPreset(input interface{}, preset uint8) error
 	return v.SendFunction("SetColorCorrectionPreset", params)
 }
 
-// SetInputLayer Set input layer (0-10)
-func (v *Client) SetInputLayer(input any, index uint8, layer any) error {
+// SetLayer Set input layer (0-10)
+func (v *Client) SetLayer(input any, index uint8, layer any) error {
 	in, err := resolveInput(input)
 	if err != nil {
 		return err
@@ -221,7 +221,7 @@ func (v *Client) SetInputLayer(input any, index uint8, layer any) error {
 	}
 	params := make(map[string]string)
 	params["Input"] = in
-	params["Value"] = fmt.Sprintf("%d%s", index, l)
+	params["Value"] = fmt.Sprintf("%d,%s", index, l)
 	return v.SendFunction("SetLayer", params)
 }
 

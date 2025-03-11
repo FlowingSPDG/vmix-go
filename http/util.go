@@ -1,10 +1,10 @@
 package vmixhttp
 
 import (
-	"fmt"
 	"strconv"
 
 	vmixgo "github.com/FlowingSPDG/vmix-go"
+	"golang.org/x/xerrors"
 )
 
 // resolveInput resolves vmix keys, number, scene name to string.
@@ -17,11 +17,6 @@ func resolveInput(input any) (string, error) {
 	case vmixgo.Input:
 		return input.Key, nil
 	default:
-		return "", fmt.Errorf("Interface type not correct(%v)", input)
+		return "", xerrors.Errorf("interface type not correct(%v)", input)
 	}
-}
-
-// itoa converts an integer to a string
-func itoa(i uint) string {
-	return strconv.Itoa(int(i))
 }

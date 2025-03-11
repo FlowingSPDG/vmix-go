@@ -1,5 +1,7 @@
 package vmixhttp
 
+import "strconv"
+
 // AudioAutoMute Automatically mute the specified input when it is not in preview or active
 func (v *Client) AudioAutoMute(input interface{}) error {
 	in, err := resolveInput(input)
@@ -147,7 +149,7 @@ func (v *Client) AudioPluginOff(input interface{}, pluginNumber uint) error {
 	}
 	params := make(map[string]string)
 	params["Input"] = in
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("AudioPluginOff", params)
 }
 
@@ -159,7 +161,7 @@ func (v *Client) AudioPluginOn(input interface{}, pluginNumber uint) error {
 	}
 	params := make(map[string]string)
 	params["Input"] = in
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("AudioPluginOn", params)
 }
 
@@ -171,7 +173,7 @@ func (v *Client) AudioPluginOnOff(input interface{}, pluginNumber uint) error {
 	}
 	params := make(map[string]string)
 	params["Input"] = in
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("AudioPluginOnOff", params)
 }
 
@@ -183,7 +185,7 @@ func (v *Client) AudioPluginShow(input interface{}, pluginNumber uint) error {
 	}
 	params := make(map[string]string)
 	params["Input"] = in
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("AudioPluginShow", params)
 }
 
@@ -205,28 +207,28 @@ func (v *Client) BusAAudioOn() error {
 // BusAAudioPluginOff Turn off Audio Plugin on Bus A, starting from 1
 func (v *Client) BusAAudioPluginOff(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusAAudioPluginOff", params)
 }
 
 // BusAAudioPluginOn Turn on Audio Plugin on Bus A, starting from 1
 func (v *Client) BusAAudioPluginOn(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusAAudioPluginOn", params)
 }
 
 // BusAAudioPluginOnOff Toggle on/off Audio Plugin on Bus A, starting from 1
 func (v *Client) BusAAudioPluginOnOff(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusAAudioPluginOnOff", params)
 }
 
 // BusAAudioPluginShow Show Audio Plugin Editor on Bus A, starting from 1
 func (v *Client) BusAAudioPluginShow(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusAAudioPluginShow", params)
 }
 
@@ -248,28 +250,28 @@ func (v *Client) BusBAudioOn() error {
 // BusBAudioPluginOff Turn off Audio Plugin on Bus B, starting from 1
 func (v *Client) BusBAudioPluginOff(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusBAudioPluginOff", params)
 }
 
 // BusBAudioPluginOn Turn on Audio Plugin on Bus B, starting from 1
 func (v *Client) BusBAudioPluginOn(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusBAudioPluginOn", params)
 }
 
 // BusBAudioPluginOnOff Toggle on/off Audio Plugin on Bus B, starting from 1
 func (v *Client) BusBAudioPluginOnOff(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusBAudioPluginOnOff", params)
 }
 
 // BusBAudioPluginShow Show Audio Plugin Editor on Bus B, starting from 1
 func (v *Client) BusBAudioPluginShow(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusBAudioPluginShow", params)
 }
 
@@ -297,28 +299,28 @@ func (v *Client) BusXAudioOn(bus string) error {
 // BusXAudioPluginOff Turn off Audio Plugin for specified bus and plugin number
 func (v *Client) BusXAudioPluginOff(bus string, pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = bus + "," + itoa(pluginNumber)
+	params["Value"] = bus + "," + strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusXAudioPluginOff", params)
 }
 
 // BusXAudioPluginOn Turn on Audio Plugin for specified bus and plugin number
 func (v *Client) BusXAudioPluginOn(bus string, pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = bus + "," + itoa(pluginNumber)
+	params["Value"] = bus + "," + strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusXAudioPluginOn", params)
 }
 
 // BusXAudioPluginOnOff Toggle on/off Audio Plugin for specified bus and plugin number
 func (v *Client) BusXAudioPluginOnOff(bus string, pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = bus + "," + itoa(pluginNumber)
+	params["Value"] = bus + "," + strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusXAudioPluginOnOff", params)
 }
 
 // BusXAudioPluginShow Show Audio Plugin Editor for specified bus and plugin number
 func (v *Client) BusXAudioPluginShow(bus string, pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = bus + "," + itoa(pluginNumber)
+	params["Value"] = bus + "," + strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("BusXAudioPluginShow", params)
 }
 
@@ -382,28 +384,28 @@ func (v *Client) MasterAudioOn() error {
 // MasterAudioPluginOff Turn off Audio Plugin on Master, starting from 1
 func (v *Client) MasterAudioPluginOff(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("MasterAudioPluginOff", params)
 }
 
 // MasterAudioPluginOn Turn on Audio Plugin on Master, starting from 1
 func (v *Client) MasterAudioPluginOn(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("MasterAudioPluginOn", params)
 }
 
 // MasterAudioPluginOnOff Toggle on/off Audio Plugin on Master, starting from 1
 func (v *Client) MasterAudioPluginOnOff(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("MasterAudioPluginOnOff", params)
 }
 
 // MasterAudioPluginShow Show Audio Plugin Editor on Master, starting from 1
 func (v *Client) MasterAudioPluginShow(pluginNumber uint) error {
 	params := make(map[string]string)
-	params["Value"] = itoa(pluginNumber)
+	params["Value"] = strconv.Itoa(int(pluginNumber))
 	return v.SendFunction("MasterAudioPluginShow", params)
 }
 

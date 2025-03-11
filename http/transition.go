@@ -162,21 +162,21 @@ func (v *Client) SetTransitionEffect1(transition string) error {
 	return v.SendFunction("SetTransitionEffect1", params)
 }
 
-// SetTransitionEffect2 Change Transition for Button 1
+// SetTransitionEffect2 Change Transition for Button 2
 func (v *Client) SetTransitionEffect2(transition string) error {
 	params := make(map[string]string)
 	params["Value"] = transition
 	return v.SendFunction("SetTransitionEffect2", params)
 }
 
-// SetTransitionEffect3 Change Transition for Button 1
+// SetTransitionEffect3 Change Transition for Button 3
 func (v *Client) SetTransitionEffect3(transition string) error {
 	params := make(map[string]string)
 	params["Value"] = transition
 	return v.SendFunction("SetTransitionEffect3", params)
 }
 
-// SetTransitionEffect4 Change Transition for Button 1
+// SetTransitionEffect4 Change Transition for Button 4
 func (v *Client) SetTransitionEffect4(transition string) error {
 	params := make(map[string]string)
 	params["Value"] = transition

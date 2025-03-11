@@ -3,6 +3,8 @@ package vmixhttp
 import (
 	"fmt"
 	"strconv"
+
+	"golang.org/x/xerrors"
 )
 
 // 内部関数：レイヤー番号のバリデーション
@@ -85,6 +87,32 @@ func (v *Client) LayerOn(input interface{}, layer uint) error {
 }
 
 // Layer1-10のCrop実装
+func (v *Client) SetLayerCrop(input any, layer uint8, x1, y1, x2, y2 float64) error {
+	switch layer {
+	case 1:
+		return v.SetLayer1Crop(input, x1, y1, x2, y2)
+	case 2:
+		return v.SetLayer2Crop(input, x1, y1, x2, y2)
+	case 3:
+		return v.SetLayer3Crop(input, x1, y1, x2, y2)
+	case 4:
+		return v.SetLayer4Crop(input, x1, y1, x2, y2)
+	case 5:
+		return v.SetLayer5Crop(input, x1, y1, x2, y2)
+	case 6:
+		return v.SetLayer6Crop(input, x1, y1, x2, y2)
+	case 7:
+		return v.SetLayer7Crop(input, x1, y1, x2, y2)
+	case 8:
+		return v.SetLayer8Crop(input, x1, y1, x2, y2)
+	case 9:
+		return v.SetLayer9Crop(input, x1, y1, x2, y2)
+	case 10:
+		return v.SetLayer10Crop(input, x1, y1, x2, y2)
+	}
+	return xerrors.Errorf("invalid layer: %d", layer)
+}
+
 func (v *Client) SetLayer1Crop(input interface{}, x1, y1, x2, y2 float64) error {
 	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer1Crop", input, &value)
@@ -133,6 +161,34 @@ func (v *Client) SetLayer9Crop(input interface{}, x1, y1, x2, y2 float64) error 
 func (v *Client) SetLayer10Crop(input interface{}, x1, y1, x2, y2 float64) error {
 	value := fmt.Sprintf("%.3f,%.3f,%.3f,%.3f", validateCrop(x1), validateCrop(y1), validateCrop(x2), validateCrop(y2))
 	return v.setLayerParam("SetLayer10Crop", input, &value)
+}
+
+// Layer1-10のCropX1実装
+
+func (v *Client) SetLayerCropX1(input any, layer uint8, x1 float64) error {
+	switch layer {
+	case 1:
+		return v.SetLayer1CropX1(input, x1)
+	case 2:
+		return v.SetLayer2CropX1(input, x1)
+	case 3:
+		return v.SetLayer3CropX1(input, x1)
+	case 4:
+		return v.SetLayer4CropX1(input, x1)
+	case 5:
+		return v.SetLayer5CropX1(input, x1)
+	case 6:
+		return v.SetLayer6CropX1(input, x1)
+	case 7:
+		return v.SetLayer7CropX1(input, x1)
+	case 8:
+		return v.SetLayer8CropX1(input, x1)
+	case 9:
+		return v.SetLayer9CropX1(input, x1)
+	case 10:
+		return v.SetLayer10CropX1(input, x1)
+	}
+	return xerrors.Errorf("invalid layer: %d", layer)
 }
 
 func (v *Client) SetLayer1CropX1(input interface{}, x1 float64) error {
@@ -185,6 +241,33 @@ func (v *Client) SetLayer10CropX1(input interface{}, x1 float64) error {
 	return v.setLayerParam("SetLayer10CropX1", input, &value)
 }
 
+// Layer1-10のCropX2実装
+func (v *Client) SetLayerCropX2(input any, layer uint8, x2 float64) error {
+	switch layer {
+	case 1:
+		return v.SetLayer1CropX2(input, x2)
+	case 2:
+		return v.SetLayer2CropX2(input, x2)
+	case 3:
+		return v.SetLayer3CropX2(input, x2)
+	case 4:
+		return v.SetLayer4CropX2(input, x2)
+	case 5:
+		return v.SetLayer5CropX2(input, x2)
+	case 6:
+		return v.SetLayer6CropX2(input, x2)
+	case 7:
+		return v.SetLayer7CropX2(input, x2)
+	case 8:
+		return v.SetLayer8CropX2(input, x2)
+	case 9:
+		return v.SetLayer9CropX2(input, x2)
+	case 10:
+		return v.SetLayer10CropX2(input, x2)
+	}
+	return xerrors.Errorf("invalid layer: %d", layer)
+}
+
 func (v *Client) SetLayer1CropX2(input interface{}, x2 float64) error {
 	value := fmt.Sprintf("%.3f", validateCrop(x2))
 	return v.setLayerParam("SetLayer1CropX2", input, &value)
@@ -235,6 +318,33 @@ func (v *Client) SetLayer10CropX2(input interface{}, x2 float64) error {
 	return v.setLayerParam("SetLayer10CropX2", input, &value)
 }
 
+// Layer1-10のCropY1実装
+func (v *Client) SetLayerCropY1(input any, layer uint8, y1 float64) error {
+	switch layer {
+	case 1:
+		return v.SetLayer1CropY1(input, y1)
+	case 2:
+		return v.SetLayer2CropY1(input, y1)
+	case 3:
+		return v.SetLayer3CropY1(input, y1)
+	case 4:
+		return v.SetLayer4CropY1(input, y1)
+	case 5:
+		return v.SetLayer5CropY1(input, y1)
+	case 6:
+		return v.SetLayer6CropY1(input, y1)
+	case 7:
+		return v.SetLayer7CropY1(input, y1)
+	case 8:
+		return v.SetLayer8CropY1(input, y1)
+	case 9:
+		return v.SetLayer9CropY1(input, y1)
+	case 10:
+		return v.SetLayer10CropY1(input, y1)
+	}
+	return xerrors.Errorf("invalid layer: %d", layer)
+}
+
 func (v *Client) SetLayer1CropY1(input interface{}, y1 float64) error {
 	value := fmt.Sprintf("%.3f", validateCrop(y1))
 	return v.setLayerParam("SetLayer1CropY1", input, &value)
@@ -283,6 +393,33 @@ func (v *Client) SetLayer9CropY1(input interface{}, y1 float64) error {
 func (v *Client) SetLayer10CropY1(input interface{}, y1 float64) error {
 	value := fmt.Sprintf("%.3f", validateCrop(y1))
 	return v.setLayerParam("SetLayer10CropY1", input, &value)
+}
+
+// Layer1-10のCropY2実装
+func (v *Client) SetLayerCropY2(input any, layer uint8, y2 float64) error {
+	switch layer {
+	case 1:
+		return v.SetLayer1CropY2(input, y2)
+	case 2:
+		return v.SetLayer2CropY2(input, y2)
+	case 3:
+		return v.SetLayer3CropY2(input, y2)
+	case 4:
+		return v.SetLayer4CropY2(input, y2)
+	case 5:
+		return v.SetLayer5CropY2(input, y2)
+	case 6:
+		return v.SetLayer6CropY2(input, y2)
+	case 7:
+		return v.SetLayer7CropY2(input, y2)
+	case 8:
+		return v.SetLayer8CropY2(input, y2)
+	case 9:
+		return v.SetLayer9CropY2(input, y2)
+	case 10:
+		return v.SetLayer10CropY2(input, y2)
+	}
+	return xerrors.Errorf("invalid layer: %d", layer)
 }
 
 func (v *Client) SetLayer1CropY2(input interface{}, y2 float64) error {
@@ -336,6 +473,32 @@ func (v *Client) SetLayer10CropY2(input interface{}, y2 float64) error {
 }
 
 // Layer1-10のPanX実装
+func (v *Client) SetLayerPanX(input any, layer uint8, pan float64) error {
+	switch layer {
+	case 1:
+		return v.SetLayer1PanX(input, pan)
+	case 2:
+		return v.SetLayer2PanX(input, pan)
+	case 3:
+		return v.SetLayer3PanX(input, pan)
+	case 4:
+		return v.SetLayer4PanX(input, pan)
+	case 5:
+		return v.SetLayer5PanX(input, pan)
+	case 6:
+		return v.SetLayer6PanX(input, pan)
+	case 7:
+		return v.SetLayer7PanX(input, pan)
+	case 8:
+		return v.SetLayer8PanX(input, pan)
+	case 9:
+		return v.SetLayer9PanX(input, pan)
+	case 10:
+		return v.SetLayer10PanX(input, pan)
+	}
+	return xerrors.Errorf("invalid layer: %d", layer)
+}
+
 func (v *Client) SetLayer1PanX(input interface{}, pan float64) error {
 	value := fmt.Sprintf("%.2f", validatePan(pan))
 	return v.setLayerParam("SetLayer1PanX", input, &value)
@@ -387,6 +550,32 @@ func (v *Client) SetLayer10PanX(input interface{}, pan float64) error {
 }
 
 // Layer1-10のPanY実装
+func (v *Client) SetLayerPanY(input any, layer uint8, pan float64) error {
+	switch layer {
+	case 1:
+		return v.SetLayer1PanY(input, pan)
+	case 2:
+		return v.SetLayer2PanY(input, pan)
+	case 3:
+		return v.SetLayer3PanY(input, pan)
+	case 4:
+		return v.SetLayer4PanY(input, pan)
+	case 5:
+		return v.SetLayer5PanY(input, pan)
+	case 6:
+		return v.SetLayer6PanY(input, pan)
+	case 7:
+		return v.SetLayer7PanY(input, pan)
+	case 8:
+		return v.SetLayer8PanY(input, pan)
+	case 9:
+		return v.SetLayer9PanY(input, pan)
+	case 10:
+		return v.SetLayer10PanY(input, pan)
+	}
+	return xerrors.Errorf("invalid layer: %d", layer)
+}
+
 func (v *Client) SetLayer1PanY(input interface{}, pan float64) error {
 	value := fmt.Sprintf("%.2f", validatePan(pan))
 	return v.setLayerParam("SetLayer1PanY", input, &value)
@@ -438,6 +627,32 @@ func (v *Client) SetLayer10PanY(input interface{}, pan float64) error {
 }
 
 // Layer1-10のZoom実装
+func (v *Client) SetLayerZoom(input any, layer uint8, zoom uint16) error {
+	switch layer {
+	case 1:
+		return v.SetLayer1Zoom(input, zoom)
+	case 2:
+		return v.SetLayer2Zoom(input, zoom)
+	case 3:
+		return v.SetLayer3Zoom(input, zoom)
+	case 4:
+		return v.SetLayer4Zoom(input, zoom)
+	case 5:
+		return v.SetLayer5Zoom(input, zoom)
+	case 6:
+		return v.SetLayer6Zoom(input, zoom)
+	case 7:
+		return v.SetLayer7Zoom(input, zoom)
+	case 8:
+		return v.SetLayer8Zoom(input, zoom)
+	case 9:
+		return v.SetLayer9Zoom(input, zoom)
+	case 10:
+		return v.SetLayer10Zoom(input, zoom)
+	}
+	return xerrors.Errorf("invalid layer: %d", layer)
+}
+
 func (v *Client) SetLayer1Zoom(input interface{}, zoom uint16) error {
 	value := fmt.Sprintf("%d", validateZoom(zoom))
 	return v.setLayerParam("SetLayer1Zoom", input, &value)

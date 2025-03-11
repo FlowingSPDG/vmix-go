@@ -44,9 +44,12 @@ func validatePan(pan float64) float64 {
 }
 
 // 内部関数：Zoom値のバリデーション
-func validateZoom(zoom uint16) uint16 {
+func validateZoom(zoom float64) float64 {
 	if zoom > 5 {
 		return 5
+	}
+	if zoom < 0 {
+		return 0
 	}
 	return zoom
 }
@@ -627,7 +630,7 @@ func (v *Client) SetLayer10PanY(input interface{}, pan float64) error {
 }
 
 // Layer1-10のZoom実装
-func (v *Client) SetLayerZoom(input any, layer uint8, zoom uint16) error {
+func (v *Client) SetLayerZoom(input any, layer uint8, zoom float64) error {
 	switch layer {
 	case 1:
 		return v.SetLayer1Zoom(input, zoom)
@@ -653,52 +656,52 @@ func (v *Client) SetLayerZoom(input any, layer uint8, zoom uint16) error {
 	return xerrors.Errorf("invalid layer: %d", layer)
 }
 
-func (v *Client) SetLayer1Zoom(input interface{}, zoom uint16) error {
-	value := fmt.Sprintf("%d", validateZoom(zoom))
+func (v *Client) SetLayer1Zoom(input interface{}, zoom float64) error {
+	value := fmt.Sprintf("%.2f", validateZoom(zoom))
 	return v.setLayerParam("SetLayer1Zoom", input, &value)
 }
 
-func (v *Client) SetLayer2Zoom(input interface{}, zoom uint16) error {
-	value := fmt.Sprintf("%d", validateZoom(zoom))
+func (v *Client) SetLayer2Zoom(input interface{}, zoom float64) error {
+	value := fmt.Sprintf("%.2f", validateZoom(zoom))
 	return v.setLayerParam("SetLayer2Zoom", input, &value)
 }
 
-func (v *Client) SetLayer3Zoom(input interface{}, zoom uint16) error {
-	value := fmt.Sprintf("%d", validateZoom(zoom))
+func (v *Client) SetLayer3Zoom(input interface{}, zoom float64) error {
+	value := fmt.Sprintf("%.2f", validateZoom(zoom))
 	return v.setLayerParam("SetLayer3Zoom", input, &value)
 }
 
-func (v *Client) SetLayer4Zoom(input interface{}, zoom uint16) error {
-	value := fmt.Sprintf("%d", validateZoom(zoom))
+func (v *Client) SetLayer4Zoom(input interface{}, zoom float64) error {
+	value := fmt.Sprintf("%.2f", validateZoom(zoom))
 	return v.setLayerParam("SetLayer4Zoom", input, &value)
 }
 
-func (v *Client) SetLayer5Zoom(input interface{}, zoom uint16) error {
-	value := fmt.Sprintf("%d", validateZoom(zoom))
+func (v *Client) SetLayer5Zoom(input interface{}, zoom float64) error {
+	value := fmt.Sprintf("%.2f", validateZoom(zoom))
 	return v.setLayerParam("SetLayer5Zoom", input, &value)
 }
 
-func (v *Client) SetLayer6Zoom(input interface{}, zoom uint16) error {
-	value := fmt.Sprintf("%d", validateZoom(zoom))
+func (v *Client) SetLayer6Zoom(input interface{}, zoom float64) error {
+	value := fmt.Sprintf("%.2f", validateZoom(zoom))
 	return v.setLayerParam("SetLayer6Zoom", input, &value)
 }
 
-func (v *Client) SetLayer7Zoom(input interface{}, zoom uint16) error {
-	value := fmt.Sprintf("%d", validateZoom(zoom))
+func (v *Client) SetLayer7Zoom(input interface{}, zoom float64) error {
+	value := fmt.Sprintf("%.2f", validateZoom(zoom))
 	return v.setLayerParam("SetLayer7Zoom", input, &value)
 }
 
-func (v *Client) SetLayer8Zoom(input interface{}, zoom uint16) error {
-	value := fmt.Sprintf("%d", validateZoom(zoom))
+func (v *Client) SetLayer8Zoom(input interface{}, zoom float64) error {
+	value := fmt.Sprintf("%.2f", validateZoom(zoom))
 	return v.setLayerParam("SetLayer8Zoom", input, &value)
 }
 
-func (v *Client) SetLayer9Zoom(input interface{}, zoom uint16) error {
-	value := fmt.Sprintf("%d", validateZoom(zoom))
+func (v *Client) SetLayer9Zoom(input interface{}, zoom float64) error {
+	value := fmt.Sprintf("%.2f", validateZoom(zoom))
 	return v.setLayerParam("SetLayer9Zoom", input, &value)
 }
 
-func (v *Client) SetLayer10Zoom(input interface{}, zoom uint16) error {
-	value := fmt.Sprintf("%d", validateZoom(zoom))
+func (v *Client) SetLayer10Zoom(input interface{}, zoom float64) error {
+	value := fmt.Sprintf("%.2f", validateZoom(zoom))
 	return v.setLayerParam("SetLayer10Zoom", input, &value)
 }

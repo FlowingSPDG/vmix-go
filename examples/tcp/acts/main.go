@@ -8,18 +8,27 @@ import (
 	"time"
 
 	vmixtcp "github.com/FlowingSPDG/vmix-go/tcp"
+	"github.com/c-bata/go-prompt"
 )
+
+func completer(d prompt.Document) []prompt.Suggest {
+	s := []prompt.Suggest{
+		{Text: "XML", Description: "Send XML Command."},
+		{Text: "VERSION", Description: "Get vMix version."},
+		{Text: "TALLY", Description: "Get tally status."},
+		{Text: "QUIT", Description: "Quit."},
+	}
+	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
+}
 
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
 
 	// Initialize vMix
 	v := vmixtcp.New("localhost")
 	// register callback
-	v.OnVersion(func(r *vmixtcp.VersionResponse, err error) {
-		if err != nil {
-			log.Println("Error:", err)
-		}
+	v.OnVersion(func(r *vmixtcp.VersionResponse) {
 		log.Println("Version:", r.Version)
 
 		// subscribe
@@ -32,22 +41,20 @@ func main() {
 			panic(err)
 		}
 
-		if err := v.Acts("InputPreview"); err != nil {
+		if err := v.Acts("InputPreview", nil); err != nil {
 			panic(err)
 		}
 	})
 
-	v.OnActs(func(r *vmixtcp.ActsResponse, err error) {
-		if err != nil {
-			log.Println("Error:", err)
-		}
-		log.Println("Response:", r.Response)
+	v.OnTally(func(r *vmixtcp.TallyResponse) {
+		log.Println("TALLY:", r.Tally)
 	})
 
-	v.OnXML(func(r *vmixtcp.XMLResponse, err error) {
-		if err != nil {
-			log.Println("Error:", err)
-		}
+	v.OnActs(func(r *vmixtcp.ActsResponse) {
+		log.Println("ACTS:", r.Response)
+	})
+
+	v.OnXML(func(r *vmixtcp.XMLResponse) {
 		log.Printf("XML: %#v\n", r.XML)
 	})
 
@@ -69,6 +76,31 @@ func main() {
 			}
 		}
 	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			break
+		default:
+			t := prompt.Input("> ", completer)
+			switch t {
+			case "QUIT":
+				return
+			case "XML":
+				if err := v.XML(); err != nil {
+					panic(err)
+				}
+			case "VERSION":
+				if err := v.Version(); err != nil {
+					panic(err)
+				}
+			case "TALLY":
+				if err := v.Tally(); err != nil {
+					panic(err)
+				}
+			}
+		}
+	}
 
 	<-ctx.Done()
 	cancel()

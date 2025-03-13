@@ -56,6 +56,7 @@ type Vmix interface {
 	Close() error                                             // Close connection. Wraps Quit() and conn.Close().
 
 	// Send commands
+	Version() error
 	Tally() error
 	Function(name string, query string) error
 	Acts(name string, input *int) error
@@ -64,28 +65,27 @@ type Vmix interface {
 	Subscribe(event, command string) error
 	Unsubscribe(command string) error
 	Quit() error // Normally you do not need to call this. Instead, call Close() for connection closure.
-	Version() error
 
 	// Callbacks. Since vMix TCP API does not respond to the command, you need to register callbacks to receive responses.
-	OnVersion(func(*VersionResponse, error))
-	OnTally(func(*TallyResponse, error))
-	OnFunction(func(*FunctionResponse, error))
-	OnActs(func(*ActsResponse, error))
-	OnXML(func(*XMLResponse, error))
-	OnXMLText(func(*XMLTextResponse, error))
-	OnSubscribe(func(*SubscribeResponse, error))
-	OnUnsubscribe(func(*UnsubscribeResponse, error))
+	OnVersion(func(*VersionResponse))
+	OnTally(func(*TallyResponse))
+	OnFunction(func(*FunctionResponse))
+	OnActs(func(*ActsResponse))
+	OnXML(func(*XMLResponse))
+	OnXMLText(func(*XMLTextResponse))
+	OnSubscribe(func(*SubscribeResponse))
+	OnUnsubscribe(func(*UnsubscribeResponse))
 }
 
 type callbacks struct {
-	version     func(*VersionResponse, error)
-	tally       func(*TallyResponse, error)
-	function    func(*FunctionResponse, error)
-	acts        func(*ActsResponse, error)
-	xml         func(*XMLResponse, error)
-	xmltext     func(*XMLTextResponse, error)
-	subscribe   func(*SubscribeResponse, error)
-	unsubscribe func(*UnsubscribeResponse, error)
+	version     func(*VersionResponse)
+	tally       func(*TallyResponse)
+	function    func(*FunctionResponse)
+	acts        func(*ActsResponse)
+	xml         func(*XMLResponse)
+	xmltext     func(*XMLTextResponse)
+	subscribe   func(*SubscribeResponse)
+	unsubscribe func(*UnsubscribeResponse)
 }
 
 // New vmix instance.
@@ -97,14 +97,14 @@ func New(dest string) Vmix {
 		conn:      nil,
 		reader:    nil,
 		callbacks: callbacks{
-			version:     func(*VersionResponse, error) {},
-			tally:       func(*TallyResponse, error) {},
-			function:    func(*FunctionResponse, error) {},
-			acts:        func(*ActsResponse, error) {},
-			xml:         func(*XMLResponse, error) {},
-			xmltext:     func(*XMLTextResponse, error) {},
-			subscribe:   func(*SubscribeResponse, error) {},
-			unsubscribe: func(*UnsubscribeResponse, error) {},
+			version:     func(*VersionResponse) {},
+			tally:       func(*TallyResponse) {},
+			function:    func(*FunctionResponse) {},
+			acts:        func(*ActsResponse) {},
+			xml:         func(*XMLResponse) {},
+			xmltext:     func(*XMLTextResponse) {},
+			subscribe:   func(*SubscribeResponse) {},
+			unsubscribe: func(*UnsubscribeResponse) {},
 		},
 	}
 }
@@ -154,6 +154,7 @@ func (v *vmix) readLine() (string, error) {
 	line, _, err := v.reader.ReadLine()
 	if err != nil {
 		if err == io.EOF {
+			v.connected = false
 			return "", ErrDisconnected
 		}
 		return "", err
@@ -165,6 +166,7 @@ func (v *vmix) readStatus() error {
 	status, err := v.reader.ReadString(' ')
 	if err != nil {
 		if err == io.EOF {
+			v.connected = false
 			return ErrDisconnected
 		}
 		return ErrFailedToReadStatus
@@ -184,6 +186,7 @@ func (v *vmix) readLength() (int, error) {
 	length, err := v.readLine()
 	if err != nil {
 		if err == io.EOF {
+			v.connected = false
 			return 0, ErrDisconnected
 		}
 		return 0, ErrFailedToReadLength
@@ -199,12 +202,14 @@ func (v *vmix) readXML(length int) (*vmixgo.APIXML, error) {
 	b := make([]byte, length)
 	if _, err := io.ReadFull(v.reader, b); err != nil {
 		if err == io.EOF {
+			v.connected = false
 			return nil, ErrDisconnected
 		}
 		return nil, ErrFailedToReadXML
 	}
 	api := vmixgo.APIXML{}
 	if err := xml.Unmarshal(b, &api); err != nil {
+		// ここで過去にエラーが発生した
 		return nil, errors.Join(xerrors.Errorf("failed to unmarshal XML : %w", err), ErrFailedToUnmarshal)
 	}
 	return &api, nil
@@ -219,103 +224,86 @@ func (v *vmix) Run(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
-			if err := v.Close(); err != nil {
-				return xerrors.Errorf("failed to close connection : %w", errors.Join(ErrFailedToDisconnect, err))
-			}
+			return ctx.Err()
 		default:
 			command, err := v.readCommand(ctx)
 			if err != nil {
-				if err == ErrDisconnected {
-					if err := v.Close(); err != nil {
-						return xerrors.Errorf("failed to close connection : %w", err)
-					}
-					return ErrDisconnected
-				}
-				continue
+				return err
 			}
 
 			switch command {
 			case commandVersion:
 				if err := v.readStatus(); err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read status : %w", err)
 					}
 				}
 				version, err := v.readLine()
 				if err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read line : %w", err)
 					}
 				}
 				resp := VersionResponse{
 					Version: string(version),
 				}
-				v.callbacks.version(&resp, err)
+				v.callbacks.version(&resp)
 
 			case commandTally:
 				if err := v.readStatus(); err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read status : %w", err)
 					}
 				}
 				tallies, err := v.readLine()
 				if err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read line : %w", err)
 					}
 				}
 				resp := TallyResponse{
 					Tally: encodeTallies([]byte(tallies)),
 				}
-				v.callbacks.tally(&resp, err)
+				v.callbacks.tally(&resp)
 
 			case commandFunction:
 				if err := v.readStatus(); err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read status : %w", err)
 					}
 				}
 				response, err := v.readLine()
 				if err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read line : %w", err)
 					}
 				}
 				resp := FunctionResponse{
 					Response: string(response),
 				}
-				v.callbacks.function(&resp, err)
+				v.callbacks.function(&resp)
 
 			case commandActs:
 				if err := v.readStatus(); err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read status : %w", err)
 					}
 				}
 				response, err := v.readLine()
 				if err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read line : %w", err)
 					}
 				}
 				resp := ActsResponse{
 					Response: string(response),
 				}
-				v.callbacks.acts(&resp, err)
+				v.callbacks.acts(&resp)
 
 			case commandXML:
 				length, err := v.readLength()
 				if err != nil {
 					if err == ErrDisconnected {
-						v.Close()
 						return err
 					}
 					log.Println("Unknown parse XML length:", err)
@@ -324,21 +312,19 @@ func (v *vmix) Run(ctx context.Context) error {
 				api, err := v.readXML(length)
 				if err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read XML : %w", err)
 					}
 				}
 
 				resp := XMLResponse{
 					XML: api,
 				}
-				v.callbacks.xml(&resp, err)
+				v.callbacks.xml(&resp)
 
 			case commandXMLText:
 				if err := v.readStatus(); err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read status : %w", err)
 					}
 					log.Println("Failed to read status:", err)
 					continue
@@ -346,8 +332,7 @@ func (v *vmix) Run(ctx context.Context) error {
 				xmltext, err := v.readLine()
 				if err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read line : %w", err)
 					}
 					log.Println("Failed to read XMLTEXT:", err)
 					continue
@@ -355,13 +340,12 @@ func (v *vmix) Run(ctx context.Context) error {
 				resp := XMLTextResponse{
 					XMLText: string(xmltext),
 				}
-				v.callbacks.xmltext(&resp, err)
+				v.callbacks.xmltext(&resp)
 
 			case commandSubscribe:
 				if err := v.readStatus(); err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read status : %w", err)
 					}
 					log.Println("Failed to read status:", err)
 					continue
@@ -369,8 +353,7 @@ func (v *vmix) Run(ctx context.Context) error {
 				respCommand, err := v.readLine()
 				if err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read line : %w", err)
 					}
 					log.Println("Failed to read XMLTEXT:", err)
 					continue
@@ -378,13 +361,12 @@ func (v *vmix) Run(ctx context.Context) error {
 				resp := SubscribeResponse{
 					Command: string(respCommand),
 				}
-				v.callbacks.subscribe(&resp, err)
+				v.callbacks.subscribe(&resp)
 
 			case commandUnsubscribe:
 				if err := v.readStatus(); err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read status : %w", err)
 					}
 					log.Println("Failed to read status:", err)
 					continue
@@ -392,8 +374,7 @@ func (v *vmix) Run(ctx context.Context) error {
 				respCommand, err := v.readLine()
 				if err != nil {
 					if err == ErrDisconnected {
-						v.Close()
-						return err
+						return xerrors.Errorf("failed to read line : %w", err)
 					}
 					log.Println("Failed to read XMLTEXT:", err)
 					continue
@@ -401,7 +382,7 @@ func (v *vmix) Run(ctx context.Context) error {
 				resp := UnsubscribeResponse{
 					Command: string(respCommand),
 				}
-				v.callbacks.unsubscribe(&resp, err)
+				v.callbacks.unsubscribe(&resp)
 
 			}
 		}
@@ -429,6 +410,14 @@ func (v *vmix) Close() error {
 	// ?
 	// v.conn = nil
 	// v.reader = nil
+	return nil
+}
+
+// VERSION Get vMix version
+func (v *vmix) Version() error {
+	if err := v.send(newVersionCommand()); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -491,13 +480,6 @@ func (v *vmix) Unsubscribe(command string) error {
 // QUIT Sends QUIT sigal
 func (v *vmix) Quit() error {
 	if err := v.send(newQuitCommand()); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (v *vmix) Version() error {
-	if err := v.send(newVersionCommand()); err != nil {
 		return err
 	}
 	return nil

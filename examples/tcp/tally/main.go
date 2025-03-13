@@ -11,12 +11,12 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 
 	v := vmixtcp.New("localhost")
 	// register callback
 	v.OnVersion(func(r *vmixtcp.VersionResponse) {
+		log.Println("Version:", r.Version)
 		// re-subscribe
 		if err := v.Subscribe(vmixtcp.EventTally, ""); err != nil {
 			panic(err)
@@ -28,13 +28,14 @@ func main() {
 
 	retry := func() error {
 		// reconnect
-		if err := v.Connect(); err != nil {
+		if err := v.Connect(ctx, time.Second); err != nil {
 			return err
 		}
 
 		// run
 		return v.Run(ctx)
 	}
+
 	go func() {
 		for {
 			if err := retry(); err != nil {

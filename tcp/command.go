@@ -39,8 +39,11 @@ func newFunctionCommand(name string, query string) []byte {
 	return []byte(fmt.Sprintf("%s %s %s%s", commandFunction, name, query, terminate))
 }
 
-func newActsCommand(name string, input ...int) []byte {
-	return []byte(fmt.Sprintf("%s %s %d%s", commandActs, name, input, terminate))
+func newActsCommand(name string, input *int) []byte {
+	if input == nil {
+		return []byte(fmt.Sprintf("%s %s%s", commandActs, name, terminate))
+	}
+	return []byte(fmt.Sprintf("%s %s %d%s", commandActs, name, *input, terminate))
 }
 
 func newXMLCommand() []byte {
@@ -64,4 +67,8 @@ func newUnsubscribeCommand(event string) []byte {
 
 func newQuitCommand() []byte {
 	return []byte(commandQuit + terminate)
+}
+
+func newVersionCommand() []byte {
+	return []byte(commandVersion + terminate)
 }

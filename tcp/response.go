@@ -1,6 +1,6 @@
 package vmixtcp
 
-import "github.com/FlowingSPDG/vmix-go/common/models"
+import vmixgo "github.com/FlowingSPDG/vmix-go"
 
 // TallyStatus alias to uint
 //go:generate stringer -type=TallyStatus
@@ -63,7 +63,7 @@ type ActsResponse struct {
 }
 
 type XMLResponse struct {
-	XML *models.APIXML
+	XML *vmixgo.APIXML
 }
 
 type XMLTextResponse struct {

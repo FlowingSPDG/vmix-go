@@ -8,7 +8,8 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/FlowingSPDG/vmix-go/common/models"
+	models "github.com/FlowingSPDG/vmix-go"
+	"golang.org/x/xerrors"
 )
 
 // Client vMix HTTP API main object
@@ -56,25 +57,23 @@ type Client struct {
 func (v *Client) SendFunction(funcname string, params map[string]string) error {
 	q := v.addr.Query()
 	q.Add("Function", funcname)
-	if params != nil {
-		for k, v := range params {
-			q.Add(k, v)
-		}
+	for k, v := range params {
+		q.Add(k, v)
 	}
 	req := *v.addr
 	queries := q.Encode()
 	req.RawQuery = queries
 	resp, err := http.Get(req.String())
 	if err != nil {
-		return fmt.Errorf("Failed to send function... %v", err)
+		return xerrors.Errorf("failed to send function... %v", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusInternalServerError {
-		return fmt.Errorf("vMix returned Internal error")
+		return xerrors.Errorf("vMix returned Internal error")
 	}
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("Failed to Read body... %v", err)
+		return xerrors.Errorf("failed to read body... %v", err)
 	}
 	return nil
 }
@@ -83,18 +82,18 @@ func (v *Client) SendFunction(funcname string, params map[string]string) error {
 func (v *Client) Refresh() error {
 	resp, err := http.Get(v.addr.String())
 	if err != nil {
-		return fmt.Errorf("Failed to connect vmix... %v", err)
+		return xerrors.Errorf("failed to connect vmix... %v", err)
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("Failed to Read body... %v", err)
+		return xerrors.Errorf("failed to read body... %v", err)
 	}
 	vnew := Client{}
 	//fmt.Printf("body : %v\n", string(body))
 	err = xml.Unmarshal(body, &vnew)
 	if err != nil {
-		return fmt.Errorf("Failed to unmarshal XML... %v", err)
+		return xerrors.Errorf("failed to unmarshal XML... %v", err)
 	}
 	vnew.addr = v.addr
 	v = &vnew
@@ -118,18 +117,18 @@ func NewClient(host string, port int) (*Client, error) {
 	u.Path = path.Join(u.Path, "/api")
 	resp, err := http.Get(u.String())
 	if err != nil {
-		return nil, fmt.Errorf("Failed to connect vmix... %v", err)
+		return nil, xerrors.Errorf("failed to connect vmix... %v", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to Read body... %v", err)
+		return nil, xerrors.Errorf("failed to read body... %v", err)
 	}
 	v := Client{}
 	err = xml.Unmarshal(body, &v)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal XML... %v", err)
+		return nil, xerrors.Errorf("failed to unmarshal XML... %v", err)
 	}
 	v.addr = u
 	return &v, nil

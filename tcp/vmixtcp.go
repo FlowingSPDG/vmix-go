@@ -13,13 +13,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/FlowingSPDG/vmix-go/common/models"
+	vmixgo "github.com/FlowingSPDG/vmix-go"
+	"golang.org/x/xerrors"
 )
 
 var (
 	ErrAlreadyConnected           = errors.New("already connected")
 	ErrDisconnected               = errors.New("disconnected")
 	ErrFailedToInitiateConnection = errors.New("failed to initiate connection")
+	ErrFailedToDisconnect         = errors.New("failed to disconnect")
 	ErrNotConnected               = errors.New("not connected to vMix")
 	ErrFailedToReadCommand        = errors.New("failed to read command")
 	ErrFailedToReadStatus         = errors.New("failed to read status")
@@ -49,14 +51,15 @@ type vmix struct {
 type Vmix interface {
 	IsConnected() bool
 
-	Connect() error                // Connects vMix TCP API. You need to call this before Run().
-	Run(ctx context.Context) error // Start Receiving TCP packet with vMix. You need to call this after Connect(). You can call other methods before Run() since connection buffer holds the response from vMix.
-	Close() error                  // Close connection. Wraps Quit() and conn.Close().
+	Connect(ctx context.Context, timeout time.Duration) error // Connects vMix TCP API. You need to call this before Run().
+	Run(ctx context.Context) error                            // Start Receiving TCP packet with vMix. You need to call this after Connect(). You can call other methods before Run() since connection buffer holds the response from vMix.
+	Close() error                                             // Close connection. Wraps Quit() and conn.Close().
 
 	// Send commands
+	Version() error
 	Tally() error
 	Function(name string, query string) error
-	Acts(name string, input ...int) error
+	Acts(name string, input *int) error
 	XML() error
 	XMLText(xpath string) error
 	Subscribe(event, command string) error
@@ -110,16 +113,16 @@ func (v *vmix) IsConnected() bool {
 	return v.connected
 }
 
-func (v *vmix) Connect() error {
+func (v *vmix) Connect(ctx context.Context, timeout time.Duration) error {
 	if v.connected {
 		return ErrAlreadyConnected
 	}
 	// Start connecting to vmix TCP API
 	host := net.JoinHostPort(v.dest, "8099")
 	d := net.Dialer{
-		Timeout: 5 * time.Second,
+		Timeout: timeout,
 	}
-	conn, err := d.Dial("tcp", host)
+	conn, err := d.DialContext(ctx, "tcp", host)
 	if err != nil {
 		return ErrFailedToInitiateConnection
 	}
@@ -130,22 +133,28 @@ func (v *vmix) Connect() error {
 	return nil
 }
 
-func (v *vmix) readCommand() (string, error) {
-	command, err := v.reader.ReadString(' ')
-	if err != nil {
-		if err == io.EOF {
-			return "", ErrDisconnected
+func (v *vmix) readCommand(ctx context.Context) (string, error) {
+	select {
+	case <-ctx.Done():
+		return "", ctx.Err()
+	default:
+		command, err := v.reader.ReadString(' ')
+		if err != nil {
+			if err == io.EOF {
+				return "", ErrDisconnected
+			}
+			return "", ErrFailedToReadCommand
 		}
-		return "", ErrFailedToReadCommand
+		command = strings.TrimSpace(command)
+		return command, nil
 	}
-	command = strings.TrimSpace(command)
-	return command, nil
 }
 
 func (v *vmix) readLine() (string, error) {
 	line, _, err := v.reader.ReadLine()
 	if err != nil {
 		if err == io.EOF {
+			v.connected = false
 			return "", ErrDisconnected
 		}
 		return "", err
@@ -157,6 +166,7 @@ func (v *vmix) readStatus() error {
 	status, err := v.reader.ReadString(' ')
 	if err != nil {
 		if err == io.EOF {
+			v.connected = false
 			return ErrDisconnected
 		}
 		return ErrFailedToReadStatus
@@ -176,6 +186,7 @@ func (v *vmix) readLength() (int, error) {
 	length, err := v.readLine()
 	if err != nil {
 		if err == io.EOF {
+			v.connected = false
 			return 0, ErrDisconnected
 		}
 		return 0, ErrFailedToReadLength
@@ -187,17 +198,19 @@ func (v *vmix) readLength() (int, error) {
 	return i, nil
 }
 
-func (v *vmix) readXML(length int) (*models.APIXML, error) {
+func (v *vmix) readXML(length int) (*vmixgo.APIXML, error) {
 	b := make([]byte, length)
 	if _, err := io.ReadFull(v.reader, b); err != nil {
 		if err == io.EOF {
+			v.connected = false
 			return nil, ErrDisconnected
 		}
 		return nil, ErrFailedToReadXML
 	}
-	api := models.APIXML{}
+	api := vmixgo.APIXML{}
 	if err := xml.Unmarshal(b, &api); err != nil {
-		return nil, ErrFailedToUnmarshal
+		// ここで過去にエラーが発生した
+		return nil, errors.Join(xerrors.Errorf("failed to unmarshal XML : %w", err), ErrFailedToUnmarshal)
 	}
 	return &api, nil
 }
@@ -208,211 +221,170 @@ func (v *vmix) Run(ctx context.Context) error {
 		return ErrNotConnected
 	}
 
-	go func() {
-		<-ctx.Done()
-		if err := v.Close(); err != nil {
-			log.Println("Failed to close connection:", err)
-		}
-	}()
-
 	for {
-		command, err := v.readCommand()
-		if err != nil {
-			if err == ErrDisconnected {
-				return v.Close()
-			}
-			log.Println("Failed to read command:", err)
-			continue
-		}
-
-		switch command {
-		case commandVersion:
-			if err := v.readStatus(); err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read status:", err)
-				continue
-			}
-			version, err := v.readLine()
-			if err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read response:", err)
-				continue
-			}
-			resp := VersionResponse{
-				Version: string(version),
-			}
-			v.callbacks.version(&resp)
-
-		case commandTally:
-			if err := v.readStatus(); err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read status:", err)
-				continue
-			}
-			tallies, err := v.readLine()
-			if err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read tallies:", err)
-				continue
-			}
-			resp := TallyResponse{
-				Tally: encodeTallies([]byte(tallies)),
-			}
-			v.callbacks.tally(&resp)
-
-		case commandFunction:
-			if err := v.readStatus(); err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read status:", err)
-				continue
-			}
-			response, err := v.readLine()
-			if err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read response:", err)
-				continue
-			}
-			resp := FunctionResponse{
-				Response: string(response),
-			}
-			v.callbacks.function(&resp)
-
-		case commandActs:
-			if err := v.readStatus(); err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read status:", err)
-				continue
-			}
-			response, err := v.readLine()
-			if err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read response:", err)
-				continue
-			}
-			resp := ActsResponse{
-				Response: string(response),
-			}
-			v.callbacks.acts(&resp)
-
-		case commandXML:
-			length, err := v.readLength()
-			if err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Unknown parse XML length:", err)
-				continue
-			}
-			api, err := v.readXML(length)
-			if err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read XML:", err)
-				continue
-			}
-
-			resp := XMLResponse{
-				XML: api,
-			}
-			v.callbacks.xml(&resp)
-
-		case commandXMLText:
-			if err := v.readStatus(); err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read status:", err)
-				continue
-			}
-			xmltext, err := v.readLine()
-			if err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read XMLTEXT:", err)
-				continue
-			}
-			resp := XMLTextResponse{
-				XMLText: string(xmltext),
-			}
-			v.callbacks.xmltext(&resp)
-
-		case commandSubscribe:
-			if err := v.readStatus(); err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read status:", err)
-				continue
-			}
-			respCommand, err := v.readLine()
-			if err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read XMLTEXT:", err)
-				continue
-			}
-			resp := SubscribeResponse{
-				Command: string(respCommand),
-			}
-			v.callbacks.subscribe(&resp)
-
-		case commandUnsubscribe:
-			if err := v.readStatus(); err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read status:", err)
-				continue
-			}
-			respCommand, err := v.readLine()
-			if err != nil {
-				if err == ErrDisconnected {
-					v.Close()
-					return err
-				}
-				log.Println("Failed to read XMLTEXT:", err)
-				continue
-			}
-			resp := UnsubscribeResponse{
-				Command: string(respCommand),
-			}
-			v.callbacks.unsubscribe(&resp)
-
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
 		default:
+			command, err := v.readCommand(ctx)
+			if err != nil {
+				return err
+			}
+
+			switch command {
+			case commandVersion:
+				if err := v.readStatus(); err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read status : %w", err)
+					}
+				}
+				version, err := v.readLine()
+				if err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read line : %w", err)
+					}
+				}
+				resp := VersionResponse{
+					Version: string(version),
+				}
+				v.callbacks.version(&resp)
+
+			case commandTally:
+				if err := v.readStatus(); err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read status : %w", err)
+					}
+				}
+				tallies, err := v.readLine()
+				if err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read line : %w", err)
+					}
+				}
+				resp := TallyResponse{
+					Tally: encodeTallies([]byte(tallies)),
+				}
+				v.callbacks.tally(&resp)
+
+			case commandFunction:
+				if err := v.readStatus(); err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read status : %w", err)
+					}
+				}
+				response, err := v.readLine()
+				if err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read line : %w", err)
+					}
+				}
+				resp := FunctionResponse{
+					Response: string(response),
+				}
+				v.callbacks.function(&resp)
+
+			case commandActs:
+				if err := v.readStatus(); err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read status : %w", err)
+					}
+				}
+				response, err := v.readLine()
+				if err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read line : %w", err)
+					}
+				}
+				resp := ActsResponse{
+					Response: string(response),
+				}
+				v.callbacks.acts(&resp)
+
+			case commandXML:
+				length, err := v.readLength()
+				if err != nil {
+					if err == ErrDisconnected {
+						return err
+					}
+					log.Println("Unknown parse XML length:", err)
+					continue
+				}
+				api, err := v.readXML(length)
+				if err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read XML : %w", err)
+					}
+				}
+
+				resp := XMLResponse{
+					XML: api,
+				}
+				v.callbacks.xml(&resp)
+
+			case commandXMLText:
+				if err := v.readStatus(); err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read status : %w", err)
+					}
+					log.Println("Failed to read status:", err)
+					continue
+				}
+				xmltext, err := v.readLine()
+				if err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read line : %w", err)
+					}
+					log.Println("Failed to read XMLTEXT:", err)
+					continue
+				}
+				resp := XMLTextResponse{
+					XMLText: string(xmltext),
+				}
+				v.callbacks.xmltext(&resp)
+
+			case commandSubscribe:
+				if err := v.readStatus(); err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read status : %w", err)
+					}
+					log.Println("Failed to read status:", err)
+					continue
+				}
+				respCommand, err := v.readLine()
+				if err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read line : %w", err)
+					}
+					log.Println("Failed to read XMLTEXT:", err)
+					continue
+				}
+				resp := SubscribeResponse{
+					Command: string(respCommand),
+				}
+				v.callbacks.subscribe(&resp)
+
+			case commandUnsubscribe:
+				if err := v.readStatus(); err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read status : %w", err)
+					}
+					log.Println("Failed to read status:", err)
+					continue
+				}
+				respCommand, err := v.readLine()
+				if err != nil {
+					if err == ErrDisconnected {
+						return xerrors.Errorf("failed to read line : %w", err)
+					}
+					log.Println("Failed to read XMLTEXT:", err)
+					continue
+				}
+				resp := UnsubscribeResponse{
+					Command: string(respCommand),
+				}
+				v.callbacks.unsubscribe(&resp)
+
+			}
 		}
 	}
 }
@@ -429,11 +401,8 @@ func (v *vmix) send(command []byte) error {
 	return nil
 }
 
-// Close connection. Calls QUIT command before connection closure.
+// Close connection
 func (v *vmix) Close() error {
-	if err := v.Quit(); err != nil {
-		return err
-	}
 	if err := v.conn.Close(); err != nil {
 		return err
 	}
@@ -441,6 +410,14 @@ func (v *vmix) Close() error {
 	// ?
 	// v.conn = nil
 	// v.reader = nil
+	return nil
+}
+
+// VERSION Get vMix version
+func (v *vmix) Version() error {
+	if err := v.send(newVersionCommand()); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -461,8 +438,8 @@ func (v *vmix) Function(name string, query string) error {
 }
 
 // Acts Send ACTS command
-func (v *vmix) Acts(name string, input ...int) error {
-	if err := v.send(newActsCommand(name, input...)); err != nil {
+func (v *vmix) Acts(name string, input *int) error {
+	if err := v.send(newActsCommand(name, input)); err != nil {
 		return err
 	}
 	return nil
